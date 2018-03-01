@@ -1,0 +1,49 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "EB132C4C-D287-41F3-AEFA-F9B1DFFE59B8",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-2296,0,3955,2299,0,3955,2299,0,-3955,-2296,0,-3955],
+				"faces": [1,1,1,2,2,1,3,3,1,4,4,1],
+				"normal": [0,1,0],
+				"uv": [-0.32,-0.912,1.321,-0.912,1.321,1.912,-0.32,1.912]
+			}
+		}],
+	"materials": [
+		{
+			"uuid": "3DB31F6D-B6C3-4233-8320-A5D34C6A5128",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		}],
+	"object": {
+		"uuid": "6121C7AB-2FB7-4A83-8651-C854230DD364",
+		"type": "Group",
+		"name": "dimian.obj",
+		"objectType": "Floor",
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "177E054E-A213-4BB9-830C-3D98E8050FC0",
+				"type": "Mesh",
+				"name": "Plane006",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "EB132C4C-D287-41F3-AEFA-F9B1DFFE59B8",
+				"material": "3DB31F6D-B6C3-4233-8320-A5D34C6A5128"
+			}]
+	}
+}

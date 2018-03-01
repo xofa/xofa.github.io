@@ -1,0 +1,46 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "0F2ADAF1-013D-4BCD-94E4-C53146568256",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [900,2800,300,-3300,2800,300,-3300,2800,-2300,3300,2800,-2300,3300,2800,2300,900,2800,2300],
+				"faces": [1,1,1,2,2,1,3,3,1,0,0,0,3,3,2,4,4,2,1,1,2,0,0,0,1,1,2,4,4,2,5,5,2,0,0,0,5,5,2,6,6,2,1,1,2,0,0,0],
+				"normal": [0,-1,0,0,-1,0],
+				"uv": [0.179,0.393,1.679,0.393,1.679,1.321,-0.679,1.321,-0.679,-0.321,0.179,-0.321]
+			}
+		}],
+	"materials": [
+		{
+			"uuid": "8550B1DF-EE17-4E31-A60A-09A775E6765A",
+			"type": "MeshBasicMaterial",
+			"color": 16777215,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		}],
+	"object": {
+		"uuid": "5252FC99-B61C-4C65-94B9-1F3A7FCE64D0",
+		"type": "Group",
+		"objectType": "Roof",
+		"name": "4-tianhuanban.obj",
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "0401BC28-8751-45EF-9284-0B927D2683EB",
+				"type": "Mesh",
+				"name": "����263",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "0F2ADAF1-013D-4BCD-94E4-C53146568256",
+				"material": "8550B1DF-EE17-4E31-A60A-09A775E6765A"
+			}]
+	}
+}

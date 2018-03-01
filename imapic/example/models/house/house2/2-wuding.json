@@ -1,0 +1,49 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "F5F46DA8-A91D-4E52-86A9-067A5F05DD0A",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-2030,2800,2382,-2030,2800,-2378,2030,2800,-2378,2030,2800,2382],
+				"faces": [1,1,1,2,2,1,3,3,1,4,4,1],
+				"normal": [0,-1,0],
+				"uv": [-0.214,-0.215,-0.214,1.213,1.214,1.213,1.214,-0.215]
+			}
+		}],
+	"materials": [
+		{
+			"uuid": "4B2ECE03-AFF9-4E73-A78C-89E0D9E0414D",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		}],
+	"object": {
+		"uuid": "9CBB251D-0E8C-465D-A4A5-90EE33440771",
+		"type": "Group",
+		"name": "wuding.obj",
+		"objectType": "Roof",
+		"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "7CD93A97-836D-45B4-873E-EC760F050FCD",
+				"type": "Mesh",
+				"name": "Plane004",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "F5F46DA8-A91D-4E52-86A9-067A5F05DD0A",
+				"material": "4B2ECE03-AFF9-4E73-A78C-89E0D9E0414D"
+			}]
+	}
+}

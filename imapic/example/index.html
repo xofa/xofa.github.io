@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ImaPic 2D </title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/example.css" rel="stylesheet">
+
+    <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/bootstrap.js"></script>
+    
+    <script src="js/lib/three.js"></script> 
+    <script src="js/lib/OBJLoader3.js"></script> 
+    <script src="js/lib/OrbitControls.js"></script> 
+    <script src="js/lib/TransformControls.js"></script> 
+
+
+  </head>
+
+  <body >
+
+    <div class="container-fluid">
+      <div class="row main-row">
+        <div class="col-xs-12 main">
+        <!-- 3D Viewer -->
+        <div id="viewer">
+          <div id="container"></div>
+
+        </div>  
+        <!-- 2D Floorplanner -->
+        <div id="floorplanner">
+          <canvas id="canvas2d"></canvas>
+
+          <div id="camera-controls">
+            <a href="#" class="btn btn-default btn-sm" id="newFile">
+              新建户型
+            </a>
+            <a href="#" class="btn btn-default btn-sm" id="saveFile">
+              保存户型
+            </a>
+            <a class="btn btn-sm btn-default btn-file">
+             <input type="file" class="hidden-input" id="loadFile">
+              读取户型
+            </a>
+          </div>
+
+          <div id="floorplanner-controls">
+
+            <button id="move" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-move"></span>
+              平移
+            </button>
+            <button id="draw" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              绘制墙体
+            </button>
+            
+             <button id="add_door" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              添加门
+            </button>
+            <button id="add_window" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              添加窗户
+            </button>
+
+            <button id="delete" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-remove"></span>
+              删除选中
+            </button>
+
+             <button id="deleteAll" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-trash"></span>
+              清空画布
+            </button>
+
+            <span class="pull-right">
+              <button class="btn btn-primary btn-sm" id="update-floorplan">切换到三维浏览</button>
+            </span>
+
+          </div>
+          <div id="draw-walls-hint">
+             按 ESC 退出墙体绘制模式
+          </div>
+          <img src="texture/wood1.jpg" id="roomBkg" style="visibility: hidden;" />
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="../build/imapic2d.js"></script>
+    <script src="../build/house3d.js"></script>
+    <script src="js/example.js"></script>
+  </body>
+</html>

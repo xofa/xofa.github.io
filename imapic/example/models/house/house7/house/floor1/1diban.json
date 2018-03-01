@@ -1,0 +1,597 @@
+{
+	"metadata": {
+		"version": 4.5,
+		"type": "Object",
+		"generator": "Object3D.toJSON"
+	},
+	"geometries": [
+		{
+			"uuid": "F6FAF930-47C6-4123-A5BE-10720296FC22",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [1408,80,2482,6258,80,2481,6259,80,-622,1408,80,-622,6259,0,-622,1408,0,-622,1408,0,2482,6258,0,2481],
+				"faces": [1,1,1,2,2,1,3,3,1,4,4,1,3,5,2,5,6,2,6,7,2,4,8,2,1,9,3,7,10,3,8,11,3,2,12,3],
+				"normal": [0,1,0,0,0,-1,0,0,1],
+				"uv": [-0.847,-0.362,1.847,-0.362,1.847,1.362,-0.847,1.362,-0.847,0.494,-0.847,0.45,1.847,0.45,1.847,0.494,-0.847,0.494,-0.847,0.45,1.847,0.45,1.847,0.494]
+			}
+		},
+		{
+			"uuid": "60D2FBA9-75F1-4397-9897-7463A48D7DB9",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-1247,0,-5065,-4587,0,-2669,-2231,0,-2669,-962,0,-1898,-962,0,-5065,-1662,0,-5807,-4587,0,-5807,-2231,0,-1898],
+				"faces": [9,13,4,10,14,4,11,15,4,0,0,0,11,15,5,12,16,5,13,17,5,9,13,5,9,13,6,14,18,6,15,19,6,0,0,0,9,13,7,15,19,7,10,14,7,0,0,0,11,15,8,16,20,8,12,16,8,0,0,0],
+				"normal": [0,1,0,0,1,0,0,1,0,0,1,0,0,1,0],
+				"uv": [-1.139,2.325,-2.995,0.994,-1.685,0.994,-0.98,0.566,-0.98,2.325,-1.369,2.737,-2.995,2.737,-1.685,0.566]
+			}
+		},
+		{
+			"uuid": "6F4AEDB7-2AED-41AF-BA74-59B16A06852D",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-2197,0,5792,1148,0,5792,-1082,0,1992,-2197,0,1992,8141,0,2481,1165,0,2478,1165,0,-1898,-1082,0,-287,1148,0,7170,8141,0,7170,-2231,0,-1898,-2231,0,-287],
+				"faces": [17,21,9,18,22,9,19,23,9,20,24,9,18,22,10,21,25,10,22,26,10,0,0,0,23,27,11,24,28,11,19,23,11,22,26,11,18,22,12,22,26,12,19,23,12,0,0,0,18,22,13,25,29,13,26,30,13,21,25,13,27,31,14,28,32,14,24,28,14,23,27,14],
+				"normal": [0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0],
+				"uv": [-11.25,1.294,-7.07,1.294,-9.856,6.044,-11.25,6.044,1.672,5.433,-7.048,5.438,-7.048,10.908,-9.856,8.893,-7.07,-0.427,1.672,-0.427,-11.292,10.908,-11.292,8.893]
+			}
+		},
+		{
+			"uuid": "9CA8BF83-7363-458B-A46B-EC6A93E2684A",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-9179,0,2401,-6073,0,5792,-4583,0,1992,-6371,0,-175,-5445,0,883,-2197,0,5792,-2197,0,1992],
+				"faces": [29,33,15,30,34,15,31,35,15,32,36,15,31,35,16,33,37,16,32,36,16,0,0,0,34,38,17,35,39,17,31,35,17,30,34,17],
+				"normal": [0,1,0,0,1,0,0,1,0],
+				"uv": [-2.24,3.794,-2.302,-1.955,2.303,0.241,2.524,3.746,2.464,1.989,1.235,-5.266,4.481,-1.798]
+			}
+		},
+		{
+			"uuid": "B77992BA-15C5-4101-89F7-0A03E0FE6FB3",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-3020,0,-287,-4587,0,-2669,-4587,0,-14,-3020,0,-14,-2231,0,-287,-2231,0,-2669],
+				"faces": [36,40,18,37,41,18,38,42,18,39,43,18,36,40,19,40,44,19,41,45,19,37,41,19],
+				"normal": [0,1,0,0,1,0],
+				"uv": [-1.628,-1.844,-6.851,3.449,-6.851,-2.449,-1.628,-2.449,1.005,-1.844,1.005,3.449]
+			}
+		},
+		{
+			"uuid": "D5E72DFB-4959-47CD-A189-207893ED745D",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [-4514,0,-14,-5482,0,975,-4583,0,2079,-1082,0,2079,-3020,0,-14,-1082,0,-287,-3020,0,-287,2851,0,-5213,1065,0,-5213,2851,0,-1898,-1815,0,-6080,-1247,0,-5065,-962,0,-5065,-1815,0,-6220,323,0,-7308,-962,0,-1898,1065,0,-5930],
+				"faces": [42,46,20,43,47,20,44,48,20,0,0,0,45,49,21,46,50,21,42,46,21,44,48,21,47,51,22,48,52,22,46,50,22,45,49,22,49,53,23,50,54,23,51,55,23,0,0,0,52,56,24,53,57,24,54,58,24,55,59,24,56,60,25,55,59,25,54,58,25,50,54,25,50,54,26,54,58,26,57,61,26,51,55,26,50,54,27,58,62,27,56,60,27,0,0,0],
+				"normal": [0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0],
+				"uv": [0.78,-4.225,2.017,-5.435,3.397,-4.313,3.397,0.064,0.78,-2.359,0.439,0.064,0.439,-2.359,4.084,0,4.084,2.233,-0.059,0,5.168,5.833,3.899,5.123,3.899,4.767,5.342,5.833,6.703,3.161,-0.059,4.767,4.98,2.233]
+			}
+		},
+		{
+			"uuid": "278BF16E-2909-425F-8BF7-8C0F74AA5079",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [7993,0,-5199,7088,0,-6043,5846,0,-6043,7993,0,-3870,4958,0,-5213,2851,0,-5213,7138,0,-3070,2851,0,-1898,7138,0,-622,1165,0,-622,1165,0,-1898],
+				"faces": [59,63,28,60,64,28,61,65,28,62,66,28,63,67,29,64,68,29,65,69,29,0,0,0,61,65,28,63,67,28,65,69,28,62,66,28,66,70,30,67,71,30,65,69,30,64,68,30,68,72,31,67,71,31,66,70,31,69,73,31],
+				"normal": [0,1,0,0,1,0,0,1,0,0,1,0],
+				"uv": [3.995,2.399,3.492,2.868,2.802,2.868,3.995,1.661,2.308,2.407,1.138,2.407,3.52,1.217,1.138,0.566,3.52,-0.144,0.201,-0.144,0.201,0.566]
+			}
+		},
+		{
+			"uuid": "81C4E993-B2CC-4BDF-82F9-0AA4338C3B9F",
+			"type": "BufferGeometry",
+			"data": {
+				"vertices": [9185,80,2480,9185,80,-622,6259,80,-622,6258,80,2481],
+				"faces": [70,74,32,71,75,32,72,76,32,73,77,32],
+				"normal": [0,1,0],
+				"uv": [3.561,-0.354,3.561,0.68,2.173,0.68,2.173,-0.354]
+			}
+		}],
+	"materials": [
+		{
+			"uuid": "045D5D9B-73E7-423D-9677-FC771BE8FC35",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"map": "898A1DDC-B33D-4638-9ECD-A715DC4FC43F",
+			"normalMap": "65E819B7-7780-4196-89E5-921FE6DABF09",
+			"normalScale": [1,1],
+			"shading": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "69729D48-1AF5-4270-A1E2-A56F2614B7F7",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"map": "BFDAB23F-6B44-4268-8182-4C9A5A046D93",
+			"normalMap": "A1EFA452-1279-4488-8FFC-8497BD831422",
+			"normalScale": [1,1],
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "41F679CC-DA93-4F6B-9D17-742EA8AB8A80",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 0.63,
+			"metalness": 0.3,
+			"emissive": 0,
+			"map": "BB7FD0FA-3E72-4443-8AE0-50FDCAC75425",
+			"normalMap": "7FC2DD1F-0A26-4497-AF10-017EDCC86D8D",
+			"normalScale": [1,1],
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "04AFBA5D-7EA7-4E8F-A23E-2A371BE0FEBC",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 0.48,
+			"metalness": 0.02,
+			"emissive": 0,
+			"map": "FFB7CF04-4C37-470B-BD13-23C517EDBFDE",
+			"normalMap": "A8493386-CBBE-4B39-BBC9-AA1269AB9571",
+			"normalScale": [1,1],
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "15D48220-C9F1-4218-882E-9F3269130D9E",
+			"type": "MeshStandardMaterial",
+			"color": 16777215,
+			"roughness": 0.7,
+			"metalness": 0.28,
+			"emissive": 0,
+			"map": "2F1025BC-6CDB-4872-9AC2-9F402762AB71",
+			"normalMap": "3B0E1E23-612B-4407-B162-A9C02138C2A0",
+			"normalScale": [1,1],
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "94A379FA-AD1B-4515-A262-B291962B530B",
+			"type": "MeshStandardMaterial",
+			"color": 16053492,
+			"roughness": 0.5,
+			"metalness": 0.06,
+			"emissive": 0,
+			"map": "7DFFE727-C7DD-478F-A513-74E36C28E678",
+			"normalMap": "116B2992-1E21-4D4B-B3A6-CF1666B05AC4",
+			"normalScale": [1,1],
+			"envMap": "6C4A784D-E9CC-45C4-94FC-110A7C9B9B07",
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "4C40EDC2-79C6-4EC0-A02A-5336D55F9449",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"map": "BC2B1DCE-198E-458A-86A3-8561D403CB42",
+			"normalMap": "32A09116-55EC-4922-B1BD-8EA030B78DA7",
+			"normalScale": [1,1],
+			"shading": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		},
+		{
+			"uuid": "AAF54389-1FC1-455C-BEF3-D71B27911BE1",
+			"type": "MeshPhongMaterial",
+			"color": 16777215,
+			"emissive": 0,
+			"specular": 1118481,
+			"shininess": 30,
+			"map": "13D3CDFF-BC7C-4F52-BC01-0EBD32A1C88F",
+			"shading": 1,
+			"depthFunc": 3,
+			"depthTest": true,
+			"depthWrite": true,
+			"skinning": false,
+			"morphTargets": false,
+			"dithering": false
+		}],
+	"textures": [
+		{
+			"uuid": "898A1DDC-B33D-4638-9ECD-A715DC4FC43F",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [1000,1000],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "AFC96F59-FEA3-4212-A817-C54DEAA2F275"
+		},
+		{
+			"uuid": "65E819B7-7780-4196-89E5-921FE6DABF09",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [1000,1000],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "6789A39E-194E-4698-99AB-EC4B8BD2778E"
+		},
+		{
+			"uuid": "BFDAB23F-6B44-4268-8182-4C9A5A046D93",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "9120C551-4424-4CC7-BFB5-643D7AE878A1"
+		},
+		{
+			"uuid": "A1EFA452-1279-4488-8FFC-8497BD831422",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "F766DCB7-1020-4C4C-8382-A3D26AD730D6"
+		},
+		{
+			"uuid": "BB7FD0FA-3E72-4443-8AE0-50FDCAC75425",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "3B709917-902F-4B51-A477-A12BF49300F6"
+		},
+		{
+			"uuid": "7FC2DD1F-0A26-4497-AF10-017EDCC86D8D",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "92882062-3F61-4E45-9AE2-4A2A3E886FD0"
+		},
+		{
+			"uuid": "FFB7CF04-4C37-470B-BD13-23C517EDBFDE",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "8EC3D743-89DE-4C1E-A555-1933708E59F6"
+		},
+		{
+			"uuid": "A8493386-CBBE-4B39-BBC9-AA1269AB9571",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "3892FBA1-4D84-47E5-8E78-33A9232FA1E3"
+		},
+		{
+			"uuid": "2F1025BC-6CDB-4872-9AC2-9F402762AB71",
+			"name": "",
+			"mapping": 300,
+			"repeat": [0.2,0.2],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "1ACA520A-B2F5-46A8-A931-C5C455310D72"
+		},
+		{
+			"uuid": "3B0E1E23-612B-4407-B162-A9C02138C2A0",
+			"name": "",
+			"mapping": 300,
+			"repeat": [0.2,0.2],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "D7543223-4582-446A-8D43-26CBDB0E8722"
+		},
+		{
+			"uuid": "7DFFE727-C7DD-478F-A513-74E36C28E678",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "53B15802-C8FF-488D-85B2-55513CC4B204"
+		},
+		{
+			"uuid": "116B2992-1E21-4D4B-B3A6-CF1666B05AC4",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "687AC07E-5FA9-4D5E-AF24-8EB06535D2F7"
+		},
+		{
+			"uuid": "6C4A784D-E9CC-45C4-94FC-110A7C9B9B07",
+			"name": "",
+			"mapping": 305,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "E03C1F4D-3E70-435F-9142-18A33FDCFC73"
+		},
+		{
+			"uuid": "BC2B1DCE-198E-458A-86A3-8561D403CB42",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [1000,1000],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "9C71EE69-EAC4-481B-93B9-EB67877CB0B0"
+		},
+		{
+			"uuid": "32A09116-55EC-4922-B1BD-8EA030B78DA7",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1.5,1.5],
+			"offset": [0,0],
+			"wrap": [1000,1000],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "6C07E31D-645A-41C9-A0D5-22941215C16D"
+		},
+		{
+			"uuid": "13D3CDFF-BC7C-4F52-BC01-0EBD32A1C88F",
+			"name": "",
+			"mapping": 300,
+			"repeat": [1,1],
+			"offset": [0,0],
+			"wrap": [
+				null,
+				null],
+			"minFilter": 1008,
+			"magFilter": 1006,
+			"anisotropy": 1,
+			"flipY": true,
+			"image": "4209BD92-2BE0-4E10-9758-BC0CF56C4192"
+		}],
+	"images": [
+		{
+			"uuid": "AFC96F59-FEA3-4212-A817-C54DEAA2F275",
+			"url": "models/house/house7/house/images/木地板.jpg"
+		},
+		{
+			"uuid": "6789A39E-194E-4698-99AB-EC4B8BD2778E",
+			"url": "models/house/house7/house/images/木地板121212.jpg"
+		},
+		{
+			"uuid": "9120C551-4424-4CC7-BFB5-643D7AE878A1",
+			"url": "models/house/house7/house/images/木地板.jpg"
+		},
+		{
+			"uuid": "F766DCB7-1020-4C4C-8382-A3D26AD730D6",
+			"url": "models/house/house7/house/images/木地板121212.jpg"
+		},
+		{
+			"uuid": "3B709917-902F-4B51-A477-A12BF49300F6",
+			"url": "models/house/house7/house/images/马可波罗水泥砖.jpg"
+		},
+		{
+			"uuid": "92882062-3F61-4E45-9AE2-4A2A3E886FD0",
+			"url": "models/house/house7/house/images/lujiaoqi_n.jpg"
+		},
+		{
+			"uuid": "8EC3D743-89DE-4C1E-A555-1933708E59F6",
+			"url": "models/house/house7/house/images/11.jpg"
+		},
+		{
+			"uuid": "3892FBA1-4D84-47E5-8E78-33A9232FA1E3",
+			"url": "models/house/house7/house/images/111.jpg"
+		},
+		{
+			"uuid": "1ACA520A-B2F5-46A8-A931-C5C455310D72",
+			"url": "models/house/house7/house/images/332.jpg"
+		},
+		{
+			"uuid": "D7543223-4582-446A-8D43-26CBDB0E8722",
+			"url": "models/house/house7/house/images/333.jpg"
+		},
+		{
+			"uuid": "53B15802-C8FF-488D-85B2-55513CC4B204",
+			"url": "models/house/house7/house/images/云多拉灰.jpg"
+		},
+		{
+			"uuid": "687AC07E-5FA9-4D5E-AF24-8EB06535D2F7",
+			"url": "models/house/house7/house/images/222.jpg"
+		},
+		{
+			"uuid": "E03C1F4D-3E70-435F-9142-18A33FDCFC73",
+			"url": "models/house/house7/house/images/1_6.jpg"
+		},
+		{
+			"uuid": "9C71EE69-EAC4-481B-93B9-EB67877CB0B0",
+			"url": "models/house/house7/house/images/木地板.jpg"
+		},
+		{
+			"uuid": "6C07E31D-645A-41C9-A0D5-22941215C16D",
+			"url": "models/house/house7/house/images/木地板121212.jpg"
+		},
+		{
+			"uuid": "4209BD92-2BE0-4E10-9758-BC0CF56C4192",
+			"url": "models/house/house7/house/images/11.jpg"
+		}],
+	"object": {
+		"uuid": "0A2A643D-25DD-41D1-9A66-CFC172E1FA59",
+		"type": "Group",
+		"name": "1diban.obj",
+		"objectType": "Floor",
+		"matrix": [0.01,0,0,0,0,0.01,0,0,0,0,0.01,0,0,0,0,1],
+		"children": [
+			{
+				"uuid": "A05857FE-206F-4940-A3A3-9835136EB4CF",
+				"type": "Mesh",
+				"name": "����518",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "F6FAF930-47C6-4123-A5BE-10720296FC22",
+				"material": "045D5D9B-73E7-423D-9677-FC771BE8FC35"
+			},
+			{
+				"uuid": "764A78E5-4805-4D2D-BE58-3BC3A0A93D0A",
+				"type": "Mesh",
+				"name": "����512",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "60D2FBA9-75F1-4397-9897-7463A48D7DB9",
+				"material": "69729D48-1AF5-4270-A1E2-A56F2614B7F7"
+			},
+			{
+				"uuid": "17052E23-B663-474A-9F77-5D46D5A1069D",
+				"type": "Mesh",
+				"name": "����513",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "6F4AEDB7-2AED-41AF-BA74-59B16A06852D",
+				"material": "41F679CC-DA93-4F6B-9D17-742EA8AB8A80"
+			},
+			{
+				"uuid": "FEDBD963-CB90-466B-B025-B10C30D3EF2B",
+				"type": "Mesh",
+				"name": "����495",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "9CA8BF83-7363-458B-A46B-EC6A93E2684A",
+				"material": "04AFBA5D-7EA7-4E8F-A23E-2A371BE0FEBC"
+			},
+			{
+				"uuid": "1122221B-FD37-4AC2-95DE-CA7B9A1DB0B9",
+				"type": "Mesh",
+				"name": "����511",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "B77992BA-15C5-4101-89F7-0A03E0FE6FB3",
+				"material": "15D48220-C9F1-4218-882E-9F3269130D9E"
+			},
+			{
+				"uuid": "CE10FCA1-B0FE-47F8-91B9-27AE7A464E0D",
+				"type": "Mesh",
+				"name": "����509",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "D5E72DFB-4959-47CD-A189-207893ED745D",
+				"material": "94A379FA-AD1B-4515-A262-B291962B530B"
+			},
+			{
+				"uuid": "4AB3DCE1-58DC-4CCE-B123-307CF155629C",
+				"type": "Mesh",
+				"name": "����519",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "278BF16E-2909-425F-8BF7-8C0F74AA5079",
+				"material": "4C40EDC2-79C6-4EC0-A02A-5336D55F9449"
+			},
+			{
+				"uuid": "F94F7708-AF67-491A-9386-2CB7D115B9CC",
+				"type": "Mesh",
+				"name": "����517",
+				"matrix": [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1],
+				"geometry": "81C4E993-B2CC-4BDF-82F9-0AA4338C3B9F",
+				"material": "AAF54389-1FC1-455C-BEF3-D71B27911BE1"
+			}]
+	}
+}
