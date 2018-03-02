@@ -1886,47 +1886,6 @@ var IMAPIC2D;
             function Draw(context) {
                 this.context = context;
             }
-            Draw.prototype.drawPolygon = function (Arr, isFill, style, strokeWidth) {
-                if (Arr.length < 2)
-                    return;
-                isFill = isFill || false;
-                this.context.beginPath();
-                this.context.moveTo(Arr[0].x, Arr[0].y);
-                for (var i = 1; i < Arr.length; i++) {
-                    this.context.lineTo(Arr[i].x, Arr[i].y);
-                }
-                this.context.closePath();
-                if (isFill) {
-                    this.context.fillStyle = style;
-                    this.context.fill();
-                }
-                else {
-                    this.context.lineWidth = strokeWidth;
-                    this.context.strokeStyle = style;
-                    this.context.stroke();
-                }
-            };
-            Draw.prototype.drawPolygonStrip = function (Arr, isFill, style, strokeWidth) {
-                if (Arr.length < 2)
-                    return;
-                isFill = isFill || false;
-                this.context.beginPath();
-                this.context.moveTo(Arr[0].x, Arr[0].y);
-                for (var i = 1; i < Arr.length; i++) {
-                    this.context.lineTo(Arr[i].x, Arr[i].y);
-                }
-                this.context.lineTo(Arr[0].x, Arr[0].y);
-                this.context.closePath();
-                if (isFill) {
-                    this.context.fillStyle = style;
-                    this.context.fill();
-                }
-                else {
-                    this.context.lineWidth = strokeWidth;
-                    this.context.strokeStyle = style;
-                    this.context.stroke();
-                }
-            };
             Draw.prototype.drawLines = function (lines, width, color) {
                 if (lines.length < 1)
                     return;
@@ -1952,6 +1911,36 @@ var IMAPIC2D;
                     this.context.strokeStyle = style;
                     this.context.stroke();
                 }
+            };
+            Draw.prototype.drawAngleBetweenLines = function (p0, p1, center) {
+                var line1 = new IMAPIC2D.Line(center, p0);
+                var line2 = new IMAPIC2D.Line(center, p1);
+                var slope1 = line1.slope();
+                var slope2 = line2.slope();
+                var angle = slope2 - slope1;
+                angle += angle < 0 ? Math.PI * 2.0 : 0.0;
+                var _LENGTH = 30;
+                var p = line1.scale(_LENGTH + 10).add(center);
+                p.rotateAround(center, angle / 2.0);
+                this.context.font = "normal 12px Arial";
+                this.context.fillStyle = "#000000";
+                this.context.textBaseline = "middle";
+                this.context.textAlign = "center";
+                this.context.strokeStyle = "#ffffff";
+                this.context.lineWidth = 4;
+                var tmpPos = p;
+                var _angle = Math.abs(angle) * 180.0 / Math.PI;
+                var a = Math.floor(_angle);
+                var b = Math.floor((_angle - a) * 60.0);
+                var str = "" + a + "°" + b + "'";
+                this.context.strokeText(str, tmpPos.x, tmpPos.y);
+                this.context.fillText(str, tmpPos.x, tmpPos.y);
+                this.context.beginPath();
+                this.context.arc(center.x, center.y, _LENGTH, slope1, slope2);
+                this.context.lineWidth = 1.0;
+                this.context.strokeStyle = '#ff0000';
+                this.context.stroke();
+                this.context.closePath();
             };
             Draw.prototype.calculateGridOffset = function (n, gridSpacing) {
                 if (n >= 0) {
@@ -2014,7 +2003,7 @@ var IMAPIC2D;
             this.drawCenter(this.handle.origin);
             this.drawWalls(this.floorplan.getWalls());
             if (this.handle.mode == IMAPIC2D._DEFINES_.EVENTS.DRAW) {
-                this.drawTarget(this.handle.target, this.handle.lastCorner);
+                this.drawTarget(this.handle.target);
             }
             this.drawCorners(this.floorplan.getCorners());
             this.drawWallLabels(this.floorplan.getWalls());
@@ -2138,19 +2127,24 @@ var IMAPIC2D;
             this.context.strokeText(str, tmpPos.x, tmpPos.y);
             this.context.fillText(str, tmpPos.x, tmpPos.y);
         };
-        Engine.prototype.drawTarget = function (target, lastNode) {
+        Engine.prototype.drawTarget = function (target) {
             var item = IMAPIC2D._DEFINES_.TARGET;
-            var targetPos = this.handle.convert(target.x, target.y);
+            var targetPos = this.handle.convert(target);
             this.drawBasic.drawCircle(targetPos, item.RADIUS, item.COLOR, false, item.WIDTH);
-            if (this.handle.lastCorner) {
-                var lastPos = this.handle.convert(lastNode.x, lastNode.y);
+            var lastNode = this.handle.lastCorner;
+            if (lastNode) {
+                var lastPos = this.handle.convert(lastNode);
                 this.drawBasic.drawLines([new IMAPIC2D.Line(lastPos, targetPos)], item.WIDTH, item.COLOR);
-                var lastVec = new IMAPIC2D.Vec2(lastNode.x, lastNode.y);
                 var lineArrays = [];
                 var fontLines = [];
-                this.getHelpLineAndLabel(new IMAPIC2D.Line(lastVec, target), lineArrays, fontLines);
+                this.getHelpLineAndLabel(new IMAPIC2D.Line(lastNode, target), lineArrays, fontLines);
                 this.drawPixelLines(lineArrays, IMAPIC2D._DEFINES_.HELP_LINE.WIDTH, IMAPIC2D._DEFINES_.HELP_LINE.COLOR);
                 this.drawWallLengthLabels(fontLines);
+                var corners = lastNode.adjacentCorners();
+                if (corners !== null && corners.length > 0) {
+                    var orginPos = this.handle.convert(corners[0]);
+                    this.drawBasic.drawAngleBetweenLines(orginPos, targetPos, lastPos);
+                }
             }
         };
         Engine.prototype.drawCorners = function (corners) {
