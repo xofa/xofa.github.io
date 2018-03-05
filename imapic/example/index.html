@@ -32,8 +32,35 @@
         </div>  
         <!-- 2D Floorplanner -->
         <div id="floorplanner">
-          <canvas id="canvas2d"></canvas>
+          <!-- <div id = "inputMenu">
+            <div id = "wallSetting" style="width: 200px;height: 100px;background-color: white;position: absolute;margin:20px">
+              长度：<input type="text" value="2222" style="width: 50px;height: 20px;font-size: 14px">
+            </div>
+          </div> -->
+          <div class="roomModal fade" tabindex="-1" role="dialog" style="width:300px;height:0px;position: absolute;" id="roomSetting">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" >房间设置</h4>
+                </div>
+                <div class="modal-body">              
+                  <a href="#" class="btn btn-default" role="button">主卧</a>
+                  <a href="#" class="btn btn-default" role="button">次卧</a>
+                  <a href="#" class="btn btn-default" role="button">儿童房</a>
+                  <a href="#" class="btn btn-default" role="button">书房</a></br>             
+                  <a href="#" class="btn btn-default" role="button">客厅</a>
+                  <a href="#" class="btn btn-default" role="button">餐厅</a>
+                  <a href="#" class="btn btn-default" role="button">卫生间</a>
+                  <a href="#" class="btn btn-default" role="button">厨房</a></br>             
+                  <a href="#" class="btn btn-default" role="button">阳台</a>
+                  <a href="#" class="btn btn-default" role="button">门厅</a>         
+                </div>
+              </div>
+            </div>
+          </div>
 
+          <canvas id="canvas2d"></canvas>
           <div id="camera-controls">
             <a href="#" class="btn btn-default btn-sm" id="newFile">
               新建户型

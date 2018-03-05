@@ -2,16 +2,15 @@
  * General Formatting
  */
 
-html {
+html,body {
   overflow: hidden;
   height: 100%;
+  width: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  height: 100%;
   -webkit-user-select:none;
   -moz-user-select:none;
   -o-user-select:none;
@@ -21,6 +20,19 @@ body {
 div {
   margin: 0;
   padding: 0;
+}
+
+.modal-backdrop.in {
+    filter: alpha(opacity=0);
+    opacity: 0;
+    display: none;
+}
+.modal-content{
+  width:300px;
+}
+.modal-dialog {
+   width: 300px;
+  margin: 30px auto;
 }
 
 /*

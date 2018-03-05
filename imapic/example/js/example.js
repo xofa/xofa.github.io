@@ -12,7 +12,10 @@ $(document).ready(function() {
   // main setup
   var opts = {
     canvasId: 'canvas2d',
-    roomImgId: "roomBkg"
+    roomImgId: "roomBkg",
+    wallSettingDivId: 'wallSetting',
+    roomSettingDivId: 'roomSetting',
+
   }
   var engine = new IMAPIC2D.Engine(opts);
 
@@ -22,8 +25,12 @@ $(document).ready(function() {
 
   engine.draw();
 
+  $('.modal-body').on("click", "a", function(){
+    engine.setRoomName($(this).text());
+  });
+        
 
- $('#update-floorplan').click(function(){
+  $('#update-floorplan').click(function(){
 
     $('#floorplanner').hide();
     $('#viewer').show();
@@ -32,7 +39,7 @@ $(document).ready(function() {
     // imapic3d.init();
     // imapic3d.loadFrom2D(str);
     linkTo3d(str);
- });
+  });
 
 
 
