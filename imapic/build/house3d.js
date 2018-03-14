@@ -2474,6 +2474,7 @@ var House3D;
                     modelData = parseJSON(modelData);
                     var loader = new THREE.ObjectLoader();
                     loader.setCrossOrigin('');
+                    
                     var object = loader.parse(modelData);
                     var item = this.loadObject(modelData.object, object);
                     return item;
