@@ -73,6 +73,7 @@
 			function handleSuccess(stream) {
 			  // window.stream = stream; // only to make stream available to console
 			  var video = document.querySelector('video');
+			  video.src = window.URL.createObjectURL(stream);
 			  video.srcObject = stream;
 			  video.onloadedmetadata = function(e) {
 			    video.play();
