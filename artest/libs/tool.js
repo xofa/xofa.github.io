@@ -1,16 +1,18 @@
+var parameters = {
+	sourceUrl : null,
+	
+	// resolution of at which we initialize in the source image
+	sourceWidth: 640,
+	sourceHeight: 480,
+	// resolution displayed for the source 
+	displayWidth: 640,
+	displayHeight: 480,
+}
+
 var _initSourceWebcam = function(onReady, onError) {
 	var _this = this;
 
-	this.parameters = {
-		sourceUrl : null,
-		
-		// resolution of at which we initialize in the source image
-		sourceWidth: 640,
-		sourceHeight: 480,
-		// resolution displayed for the source 
-		displayWidth: 640,
-		displayHeight: 480,
-	}
+
 
 	// init default value
 	onError = onError || function(error){	
@@ -21,8 +23,8 @@ var _initSourceWebcam = function(onReady, onError) {
 	domElement.setAttribute('autoplay', '');
 	domElement.setAttribute('muted', '');
 	domElement.setAttribute('playsinline', '');
-	domElement.style.width = this.parameters.displayWidth+'px'
-	domElement.style.height = this.parameters.displayHeight+'px'
+	domElement.style.width = parameters.displayWidth+'px'
+	domElement.style.height = parameters.displayHeight+'px'
 
 	// check API is available
 	if (navigator.mediaDevices === undefined 
@@ -46,12 +48,12 @@ var _initSourceWebcam = function(onReady, onError) {
 			video: {
 				facingMode: 'environment',
 				width: {
-					ideal: _this.parameters.sourceWidth,
+					ideal: parameters.sourceWidth,
 					// min: 1024,
 					// max: 1920
 				},
 				height: {
-					ideal: _this.parameters.sourceHeight,
+					ideal: parameters.sourceHeight,
 					// min: 776,
 					// max: 1080
 				}
@@ -113,8 +115,8 @@ var onResizeElement = function(domElement){
 	var screenWidth = window.innerWidth
 	var screenHeight = window.innerHeight
 
-	var sourceWidth = this.domElement.videoWidth
-	var sourceHeight = this.domElement.videoHeight
+	var sourceWidth = parameters.sourceWidth
+	var sourceHeight = parameters.sourceHeight
 	
 	// compute sourceAspect
 	var sourceAspect = sourceWidth / sourceHeight
