@@ -53,7 +53,8 @@
 
 		<!-- <script src="js/Detector.js"></script> -->
 		<script src="libs/stats.min.js"></script>
-		<script src="libs/ar.js"></script>
+		<script src="libs/tool.js"></script>
+		<!-- <script src="libs/ar.js"></script> -->
 
 		<!-- div class="parent">
 		  <div id="monitor"></div>
@@ -68,25 +69,25 @@
 
 			var camera, controls, scene, renderer;
 
-			var arToolkitSource = new THREEx.ArToolkitSource({
-				// to read from the webcam 
-				sourceType : 'webcam',
+			// var arToolkitSource = new THREEx.ArToolkitSource({
+			// 	// to read from the webcam 
+			// 	sourceType : 'webcam',
 				
-				// // to read from an image
-				// sourceType : 'image',
-				// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg',		
+			// 	// // to read from an image
+			// 	// sourceType : 'image',
+			// 	// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg',		
 
-				// to read from a video
-				// sourceType : 'video',
-				// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',		
-			})
+			// 	// to read from a video
+			// 	// sourceType : 'video',
+			// 	// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',		
+			// })
 
-			arToolkitSource.init(function onReady(){
-				arToolkitSource.onResize();
-			});
+			// arToolkitSource.init(function onReady(){
+			// 	arToolkitSource.onResize();
+			// });
 
 
-	
+			initAR();
 
 
 

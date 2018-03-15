@@ -5742,7 +5742,7 @@ ARjs.Source = THREEx.ArToolkitSource = function(parameters){
 	var _this = this
 
 	this.ready = false
-        this.domElement = null
+    this.domElement = null
 
 	// handle default parameters
 	this.parameters = {

@@ -99,18 +99,16 @@ var _initSourceWebcam = function(onReady, onError) {
 var initAR = function(onReady, onError){
 
 	function onSourceReady(){
-		document.body.appendChild(_this.domElement);
+		document.body.appendChild(domElement);
 		_this.ready = true
 		onReady && onReady()
     } 
 
-	this.domElement = this._initSourceWebcam(onSourceReady, onError) ;
-    this.domElement.style.position = 'absolute';
-    this.domElement.style.top = '0px';
-    this.domElement.style.left = '0px';
-    this.domElement.style.zIndex = '-2';
-
-	return this；
+	var domElement = _initSourceWebcam(onSourceReady, onError) ;
+    domElement.style.position = 'absolute';
+    domElement.style.top = '0px';
+    domElement.style.left = '0px';
+    domElement.style.zIndex = '-2';
         
 }
 
