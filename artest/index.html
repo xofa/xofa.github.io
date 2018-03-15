@@ -171,8 +171,8 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: false,alpha: false } );
-				// renderer.setClearAlpha(0.0);
+				renderer = new THREE.WebGLRenderer( { antialias: false,alpha: true } );
+				renderer.setClearAlpha(0.0);
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
