@@ -71,15 +71,19 @@
 
 
 			function handleSuccess(stream) {
-			  window.stream = stream; // only to make stream available to console
+			  // window.stream = stream; // only to make stream available to console
+			  var video = document.querySelector('video');
 			  video.srcObject = stream;
+			  video.onloadedmetadata = function(e) {
+			    video.play();
+			  };
 			}
 
-			function handleError(error) {
-			  console.log('getUserMedia error: ', error);
+			function handleError(err) {
+			  console.log(err.name + ": " + err.message); }
 			}
 			navigator.mediaDevices.getUserMedia({
-			  video: true
+			  video: { facingMode: { exact: "environment" } }//user
 			}).then(handleSuccess).catch(handleError);
 
 			init();
