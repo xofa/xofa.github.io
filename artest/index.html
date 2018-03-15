@@ -130,7 +130,7 @@
 			    }else {
 				    alert("你的浏览器不支持访问用户媒体设备");
 				}
-			    
+
 			}
 		
 
@@ -158,7 +158,19 @@
 			// }).then(handleSuccess).catch(handleError);
 
 			    //调用用户媒体设备，访问摄像头
-			getUserMedia({"video": true },handleSuccess,handleError);
+			//getUserMedia({"video": true },handleSuccess,handleError);
+
+			navigator.getUserMedia = (navigator.getUserMedia ||
+                            navigator.webkitGetUserMedia ||
+                            navigator.mozGetUserMedia ||
+                            navigator.msGetUserMedia);
+            if (navigator.getUserMedia) {
+            	var video = document.querySelector('video');
+                navigator.getUserMedia({ video: true },
+                  function (localMediaStream) {
+                      video.src = window.URL.createObjectURL(localMediaStream);
+                  }, handleError);
+            }
 			
 
 
