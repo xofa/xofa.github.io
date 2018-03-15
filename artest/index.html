@@ -48,6 +48,7 @@
 		<div id="container"></div>
 
 		<script src="libs/three.min.js"></script>
+		<script src="libs/OrbitControls.js"></script>
 		<script src="libs/TrackballControls.js"></script>
 		<script src="libs/stats.min.js"></script>
 
@@ -56,14 +57,14 @@
 
 		<!-- <script src="OBJLoader3.js"></script> 
 		<script src="house3d.js"></script> -->
-		<!-- <script src="mmd/mmdparser.min.js"></script>
+		<script src="mmd/mmdparser.min.js"></script>
 		<script src="mmd/ammo.js"></script>
 
 		<script src="mmd/TGALoader.js"></script>
 		<script src="mmd/MMDLoader.js"></script>
 		<script src="mmd/CCDIKSolver.js"></script>
 		<script src="mmd/MMDPhysics.js"></script>
-		<script src="mmd/dat.gui.min.js"></script> -->
+		<script src="mmd/dat.gui.min.js"></script>
 
 		<!-- <script src="js/Detector.js"></script> -->
 		<script src="tool.js"></script>
@@ -76,7 +77,7 @@
 
 		<script>
 
-			// initAR();
+			initAR();
 
 			// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -114,7 +115,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 30;
+				camera.position.z = 70;
 
 				//controls = new THREE.TrackballControls( camera );
 
@@ -138,23 +139,23 @@
 				// scene.background = new THREE.Color( 0xcccccc );
 				// scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				// var geometry = new THREE.CylinderGeometry( 0, 5, 10, 4, 1 );
+				// var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				// for ( var i = 0; i < 10; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 20;
-					mesh.position.y = ( Math.random() - 0.5 ) * 20;
-					mesh.position.z = ( Math.random() - 0.5 ) * 20;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.position.x = ( Math.random() - 0.5 ) * 40;
+				// 	mesh.position.y = ( Math.random() - 0.5 ) * 40;
+				// 	mesh.position.z = ( Math.random() - 0.5 ) * 40;
+				// 	mesh.updateMatrix();
+				// 	mesh.matrixAutoUpdate = false;
+				// 	scene.add( mesh );
 
-				}
+				// }
 
 				//loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
-				//loadMMD();
+				loadMMD();
 
 
 				// lights
@@ -174,7 +175,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new THREE.OrbitControls( camera ,renderer.domElement );
 				
 
 				container = document.getElementById( 'container' );
@@ -187,7 +188,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				//
-
 
 			}
 
@@ -358,7 +358,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-
+				// controls.handleResize();
 
 			}
 
@@ -368,7 +368,7 @@
 				stats.begin();
 				render();
 				stats.end();
-
+				controls.update();
 			}
 
 			function render() {
