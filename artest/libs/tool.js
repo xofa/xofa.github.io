@@ -25,23 +25,19 @@ var _initSourceWebcam = function(onReady, onError) {
 	domElement.style.height = this.parameters.displayHeight+'px'
 
 	// check API is available
-	// if (navigator.mediaDevices === undefined  || navigator.mediaDevices.enumerateDevices === undefined  || navigator.mediaDevices.getUserMedia === undefined  ){
-	var fctName = '';
-	if( navigator.mediaDevices === undefined ){				
-		fctName = 'navigator.mediaDevices'
-	}else if( navigator.mediaDevices.enumerateDevices === undefined ){	
-		fctName = 'navigator.mediaDevices.enumerateDevices'
-	}else if( navigator.mediaDevices.getUserMedia === undefined ){		
-		fctName = 'navigator.mediaDevices.getUserMedia';
-	}else {
-		console.assert(false);
-		return null;
+	if (navigator.mediaDevices === undefined 
+			|| navigator.mediaDevices.enumerateDevices === undefined 
+			|| navigator.mediaDevices.getUserMedia === undefined  ){
+		if( navigator.mediaDevices === undefined )				var fctName = 'navigator.mediaDevices'
+		else if( navigator.mediaDevices.enumerateDevices === undefined )	var fctName = 'navigator.mediaDevices.enumerateDevices'
+		else if( navigator.mediaDevices.getUserMedia === undefined )		var fctName = 'navigator.mediaDevices.getUserMedia'
+		else console.assert(false)
+		onError({
+			name: '',
+			message: 'WebRTC issue-! '+fctName+' not present in your browser'
+		})
+		return null
 	}
-	onError({
-		name: '',
-		message: 'WebRTC issue-! '+fctName+' not present in your browser'
-	});
-	// }
 
 	// get available devices
 	navigator.mediaDevices.enumerateDevices().then(function(devices) {
