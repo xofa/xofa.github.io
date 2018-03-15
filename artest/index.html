@@ -17,7 +17,7 @@
 				overflow: hidden;
 			}
 
-			#container {
+			#container,video {
 			position: absolute;
 			  top: 0;
 			  left: 0;
@@ -44,8 +44,8 @@
 	</head>
 
 	<body>
-		<video autoplay style="width: 480px;height: 320px"></video>
-		<!-- <div id="container"></div> -->
+		<video autoplay ></video>
+		<div id="container"></div>
 
 		<script src="libs/three.js"></script>
 
@@ -67,7 +67,7 @@
 
 			var camera, controls, scene, renderer;
 
-			 function hasUserMedia(){//判断是否支持调用设备api，因为浏览器不同所以判断方式不同哦    
+/*			 function hasUserMedia(){//判断是否支持调用设备api，因为浏览器不同所以判断方式不同哦    
         return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);    
     }    
     if(hasUserMedia()){    
@@ -84,7 +84,7 @@
         });    
     }else{    
         alert("浏览器暂不支持")    
-    } 
+    } */
 
 
 
@@ -127,7 +127,10 @@
 			    } else if (navigator.getUserMedia){
 			        //旧版API
 			        navigator.getUserMedia(constrains).then(success).catch(error);
-			    }
+			    }else {
+				    alert("你的浏览器不支持访问用户媒体设备");
+				}
+			    
 			}
 		
 
@@ -154,12 +157,9 @@
 			//   video: { facingMode: { exact: "environment" } }//user
 			// }).then(handleSuccess).catch(handleError);
 
-			if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia){
 			    //调用用户媒体设备，访问摄像头
-				//getUserMedia({"video": true },handleSuccess,handleError);
-			} else {
-			    alert("你的浏览器不支持访问用户媒体设备");
-			}
+			getUserMedia({"video": true },handleSuccess,handleError);
+			
 
 
 			init();
