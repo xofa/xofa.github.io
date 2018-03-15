@@ -73,15 +73,20 @@
 			function handleSuccess(stream) {
 			  // window.stream = stream; // only to make stream available to console
 			  var video = document.querySelector('video');
-			  video.src = window.URL.createObjectURL(stream);
-			  video.srcObject = stream;
+			    // 旧的浏览器可能没有srcObject
+			  if ("srcObject" in video) {
+			    video.srcObject = stream;
+			  } else {
+			    // 防止再新的浏览器里使用它，应为它已经不再支持了
+			    video.src = window.URL.createObjectURL(stream);
+			  }
 			  video.onloadedmetadata = function(e) {
 			    video.play();
 			  };
 			}
 
 			function handleError(err) {
-			  console.log(err.name + ": " + err.message); 
+			  alert(err.name + ": " + err.message); 
 			}
 			navigator.mediaDevices.getUserMedia({
 			  video: { facingMode: { exact: "environment" } }//user
