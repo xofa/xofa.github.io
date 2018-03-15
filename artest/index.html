@@ -118,7 +118,6 @@
 				camera.position.z = 30;
 
 				//controls = new THREE.TrackballControls( camera );
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				// controls.rotateSpeed = 1.0;
 				// controls.zoomSpeed = 1.2;
@@ -175,6 +174,8 @@
 				renderer.setClearAlpha(0.0);
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
