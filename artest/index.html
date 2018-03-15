@@ -53,7 +53,8 @@
 		<script src="libs/stats.min.js"></script>
 
 		<script src="jquery.js"></script>
-
+		<!-- <script src="jszip.min.js"></script>
+		<script src="jszip-utils.min.js"></script> -->
 
 		<!-- <script src="OBJLoader3.js"></script> 
 		<script src="house3d.js"></script> -->
@@ -115,7 +116,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 70;
+				camera.position.z = 30;
 
 				//controls = new THREE.TrackballControls( camera );
 
@@ -192,16 +193,40 @@
 			}
 
 			function loadMMD(){
+
 				var modelFile = 'models/mmd/miku/miku_v2.pmd';
 				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
 
 				helper = new THREE.MMDHelper();
-
 				var loader = new THREE.MMDLoader();
 
-				loader.load( modelFile, vmdFiles, function ( object ) {
+				// JSZipUtils.getBinaryContent('models/mmd/miku/miku.zip', function(err, data) {  
+				//     if(err) {  
+				//         throw err; // or handle err  
+				//     }  
+				//     var zip = new JSZip(data);  
+				  	
+				//     var modelStr = zip.file('miku_v2.pmd').asText(); 
+				//     var vmdStr = zip.file('wavefile_v2.vmd').asText(); 
 
-					mesh = object;
+				//     var mesh = loader.parsePmd(modelStr);
+
+				//     this.loadModel( modelUrl, function ( mesh ) {
+
+				// 		scope.loadVmds( vmdUrls, function ( vmd ) {
+
+				// 			scope.pourVmdIntoModel( mesh, vmd );
+				// 			onLoad( mesh );
+
+				// 		} );
+
+				// 	} );
+
+
+				// });
+				loader.load( modelFile, vmdFiles, onLoad);
+				function onLoad(mesh){
+
 					mesh.position.y = -10;
 					scene.add( mesh );
 
@@ -226,9 +251,14 @@
 
 					helper.unifyAnimationDuration( { afterglow: 2.0 } );
 
-					initGui();
+					//initGui();
+					helper.doAnimation = true;
+					makePhongMaterials( mesh.material );
+					helper.doIk = true;
+					helper.enablePhysics(true);
+				}
 
-				} );
+				
 			}
 
 			var phongMaterials;
@@ -263,6 +293,7 @@
 					'show IK bones': false,
 					'show rigid bodies': false
 				};
+
 
 				var gui = new dat.GUI();
 
