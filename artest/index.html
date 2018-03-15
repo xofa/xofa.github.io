@@ -171,7 +171,7 @@
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: false,alpha: true } );
-				renderer.setClearAlpha(0.0);
+				// renderer.setClearAlpha(0.0);
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -186,7 +186,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 				//
 
-				render();
 
 			}
 
@@ -359,22 +358,22 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
 
-				render();
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
+				stats.begin();
+				render();
+				stats.end();
 
 			}
 
 			function render() {
 
-				if ( helper !== undefined ) helper.animate( clock.getDelta() );
+				helper.animate( clock.getDelta() );
 				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
 				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 
