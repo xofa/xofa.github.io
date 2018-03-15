@@ -109,16 +109,7 @@
 			        navigator.getUserMedia(constrains).then(success).catch(error);
 			    }
 			}
-
-			window.addeventlistener("domcontentloaded", function() {
-				
-			if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia){
-			    //调用用户媒体设备，访问摄像头
-				getUserMedia({"video": true },handleSuccess,handleError);
-				} else {
-				    alert("你的浏览器不支持访问用户媒体设备");
-				}
-			}, false);
+		
 
 			function handleSuccess(stream) {
 			  // window.stream = stream; // only to make stream available to console
@@ -142,6 +133,13 @@
 			// navigator.mediaDevices.getUserMedia({
 			//   video: { facingMode: { exact: "environment" } }//user
 			// }).then(handleSuccess).catch(handleError);
+
+			if (navigator.mediaDevices.getUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia){
+			    //调用用户媒体设备，访问摄像头
+				getUserMedia({"video": true },handleSuccess,handleError);
+			} else {
+			    alert("你的浏览器不支持访问用户媒体设备");
+			}
 
 
 			init();
