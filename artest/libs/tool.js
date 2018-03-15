@@ -96,7 +96,6 @@ var initAR = function(onReady, onError){
 
 	function onSourceReady(){
 		document.body.appendChild(domElement);
-		_this.ready = true
 		onReady && onReady()
     } 
 
@@ -105,9 +104,43 @@ var initAR = function(onReady, onError){
     domElement.style.top = '0px';
     domElement.style.left = '0px';
     domElement.style.zIndex = '-2';
-        
+
+    onResizeElement(domElement); 
 }
 
+var onResizeElement = function(domElement){
+
+	var screenWidth = window.innerWidth
+	var screenHeight = window.innerHeight
+
+	var sourceWidth = this.domElement.videoWidth
+	var sourceHeight = this.domElement.videoHeight
+	
+	// compute sourceAspect
+	var sourceAspect = sourceWidth / sourceHeight
+	var screenAspect = screenWidth / screenHeight
+
+	// if screenAspect < sourceAspect, then change the width, else change the height
+	if( screenAspect < sourceAspect ){
+		// compute newWidth and set .width/.marginLeft
+		var newWidth = sourceAspect * screenHeight
+		domElement.style.width = newWidth+'px'
+		domElement.style.marginLeft = -(newWidth-screenWidth)/2+'px'
+		
+		// init style.height/.marginTop to normal value
+		domElement.style.height = screenHeight+'px'
+		domElement.style.marginTop = '0px'
+	}else{
+		// compute newHeight and set .height/.marginTop
+		var newHeight = 1 / (sourceAspect / screenWidth)
+		domElement.style.height = newHeight+'px'
+		domElement.style.marginTop = -(newHeight-screenHeight)/2+'px'
+		
+		// init style.width/.marginLeft to normal value
+		domElement.style.width = screenWidth+'px'
+		domElement.style.marginLeft = '0px'
+	}
+};
 
 var handleMedia = function(){
 			//访问用户媒体设备的兼容方法
