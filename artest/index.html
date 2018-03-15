@@ -77,7 +77,7 @@
 
 		<script>
 
-			initAR();
+			// initAR();
 
 			// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -374,7 +374,7 @@
 
 			function render() {
 
-				if ( physicsHelper !== undefined ) helper.animate( clock.getDelta() );
+				if ( helper !== undefined ) helper.animate( clock.getDelta() );
 				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
 				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 
