@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - trackball controls</title>
+		<title>imapic webAR</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -17,7 +17,7 @@
 				overflow: hidden;
 			}
 
-			#container,video {
+			#container {
 			position: absolute;
 			  top: 0;
 			  left: 0;
@@ -44,16 +44,21 @@
 	</head>
 
 	<body>
-		<video autoplay ></video>
+		<!-- <video autoplay ></video> -->
 		<div id="container"></div>
 
 		<script src="libs/three.min.js"></script>
-
 		<script src="libs/TrackballControls.js"></script>
+		<script src="libs/stats.min.js"></script>
+
+		<script src="jquery.js"></script>
+
+
+		<script src="OBJLoader3.js"></script> 
+		<script src="house3d.js"></script>
 
 		<!-- <script src="js/Detector.js"></script> -->
-		<script src="libs/stats.min.js"></script>
-		<script src="libs/tool.js"></script>
+		<script src="tool.js"></script>
 		<!-- <script src="libs/ar.js"></script> -->
 
 		<!-- div class="parent">
@@ -62,7 +67,7 @@
 		</div> -->
 
 		<script>
-			
+
 			initAR();
 
 			// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -121,20 +126,23 @@
 				// scene.background = new THREE.Color( 0xcccccc );
 				// scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				// var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				// var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				// for ( var i = 0; i < 500; i ++ ) {
 
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-					mesh.updateMatrix();
-					mesh.matrixAutoUpdate = false;
-					scene.add( mesh );
+				// 	var mesh = new THREE.Mesh( geometry, material );
+				// 	mesh.position.x = ( Math.random() - 0.5 ) * 1000;
+				// 	mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+				// 	mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+				// 	mesh.updateMatrix();
+				// 	mesh.matrixAutoUpdate = false;
+				// 	scene.add( mesh );
 
-				}
+				// }
+
+				loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
+				
 
 
 				// lights
@@ -143,9 +151,9 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
-				scene.add( light );
+				// var light = new THREE.DirectionalLight( 0x002288 );
+				// light.position.set( -1, -1, -1 );
+				// scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
@@ -171,6 +179,45 @@
 
 				render();
 
+			}
+
+			function loadModel(id){
+				
+				var loader = new House3D.SceneEditor.Loaders.ModelLoader();
+
+				var token = 'A72HjL/ix79l9M1uqGH7SfXhdNtqM81XaRfaTAeXz/2X4p+qW68O1g==';
+				  // var url = "http://192.168.0.130:8088/api/item/getitemgeometry" ; //获取物件
+				var url = "http://101.132.176.37:8059/api/item/getitemgeometry" ; //获取物件
+
+				$.get(url, {UUID: id,Token:token}, function(data,status){
+
+				    var res = data.Data;
+
+				    var itemJson = JSON.parse(res.ItemJson);
+				    itemJson.geometries = JSON.parse(res.GeometryJson);
+
+				    var metadata = {
+				      uuid: itemJson.geometries.UUID,
+				      model: itemJson.geometries.UUID,
+				      position: {x: 0,y: 0,z: 0}
+				    };
+				    
+				    var data = {
+				      model: itemJson,
+				      metadata: metadata
+				    };
+				    loader.createItem1(data,function(item){
+				      // console.log(item);
+				      var box = new THREE.Box3().setFromObject(item);
+				      console.log(box);
+				      // item.matrix.identity();
+				      // item.applyMatrix(matrix);
+				      item.scale.set(0.1,0.1,0.1);
+				      // group.addItem(item);//,
+				      scene.add(item);
+				    });
+
+				});
 			}
 
 			function onWindowResize() {
