@@ -53,6 +53,7 @@
 
 		<!-- <script src="js/Detector.js"></script> -->
 		<script src="libs/stats.min.js"></script>
+		<script src="libs/ar.js"></script>
 
 		<!-- div class="parent">
 		  <div id="monitor"></div>
@@ -67,111 +68,27 @@
 
 			var camera, controls, scene, renderer;
 
-/*			 function hasUserMedia(){//判断是否支持调用设备api，因为浏览器不同所以判断方式不同哦    
-        return !!(navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia);    
-    }    
-    if(hasUserMedia()){    
-        //alert("浏览器支持")    
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;    
-        navigator.getUserMedia({    
-            video:true,//开启视频    
-            audio:false//先关闭音频，因为会有回响，以后两台电脑通信不会有响声    
-        },function(stream){//将视频流交给video    
-            var video=document.querySelector("video");    
-            video.src=window.URL.createObjectURL(stream);       
-        },function(err){    
-            console.log("capturing",err)    
-        });    
-    }else{    
-        alert("浏览器暂不支持")    
-    } */
+			var arToolkitSource = new THREEx.ArToolkitSource({
+				// to read from the webcam 
+				sourceType : 'webcam',
+				
+				// // to read from an image
+				// sourceType : 'image',
+				// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/images/img.jpg',		
+
+				// to read from a video
+				// sourceType : 'video',
+				// sourceUrl : THREEx.ArToolkitContext.baseURL + '../data/videos/headtracking.mp4',		
+			})
+
+			arToolkitSource.init(function onReady(){
+				arToolkitSource.onResize();
+			});
 
 
+	
 
-		/*	// 老的浏览器可能根本没有实现 mediaDevices，所以我们可以先设置一个空的对象
-			if (navigator.mediaDevices === undefined) {
-			  navigator.mediaDevices = {};
-			}
 
-			// 一些浏览器部分支持 mediaDevices。我们不能直接给对象设置 getUserMedia 
-			// 因为这样可能会覆盖已有的属性。这里我们只会在没有getUserMedia属性的时候添加它。
-			if (navigator.mediaDevices.getUserMedia === undefined) {
-			  navigator.mediaDevices.getUserMedia = function(constraints) {
-
-			    // 首先，如果有getUserMedia的话，就获得它
-			    var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-			    // 一些浏览器根本没实现它 - 那么就返回一个error到promise的reject来保持一个统一的接口
-			    if (!getUserMedia) {
-			      return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-			    }
-
-			    // 否则，为老的navigator.getUserMedia方法包裹一个Promise
-			    return new Promise(function(resolve, reject) {
-			      getUserMedia.call(navigator, constraints, resolve, reject);
-			    });
-			  }
-			}*/
-
-			//访问用户媒体设备的兼容方法
-			function getUserMedia(constrains,success,error){
-			    if(navigator.mediaDevices.getUserMedia){
-			        //最新标准API
-			        navigator.mediaDevices.getUserMedia(constrains).then(success).catch(error);
-			    } else if (navigator.webkitGetUserMedia){
-			        //webkit内核浏览器
-			        navigator.webkitGetUserMedia(constrains).then(success).catch(error);
-			    } else if (navigator.mozGetUserMedia){
-			        //Firefox浏览器
-			        navagator.mozGetUserMedia(constrains).then(success).catch(error);
-			    } else if (navigator.getUserMedia){
-			        //旧版API
-			        navigator.getUserMedia(constrains).then(success).catch(error);
-			    }else {
-				    alert("你的浏览器不支持访问用户媒体设备");
-				}
-
-			}
-		
-
-			function handleSuccess(stream) {
-			  // window.stream = stream; // only to make stream available to console
-			  var video = document.querySelector('video');
-			    // 旧的浏览器可能没有srcObject
-			  if ("srcObject" in video) {
-			    video.srcObject = stream;
-			  } else {
-			    // 防止再新的浏览器里使用它，应为它已经不再支持了
-			    var CompatibleURL = window.URL || window.webkitURL;
-			    video.src = CompatibleURL.createObjectURL(stream);
-			  }
-			  // video.onloadedmetadata = function(e) {
-			    video.play();
-			  // };
-			}
-
-			function handleError(err) {
-			  alert(err.name + ": " + err.message); 
-			}
-			// navigator.mediaDevices.getUserMedia({
-			//   video: { facingMode: { exact: "environment" } }//user
-			// }).then(handleSuccess).catch(handleError);
-
-			    //调用用户媒体设备，访问摄像头
-			getUserMedia({video: { facingMode: { exact: "environment" } } },handleSuccess,handleError);
-
-			// navigator.getUserMedia = (navigator.getUserMedia ||
-   //                          navigator.webkitGetUserMedia ||
-   //                          navigator.mozGetUserMedia ||
-   //                          navigator.msGetUserMedia);
-   //          if (navigator.getUserMedia) {
-   //          	var video = document.querySelector('video');
-   //              navigator.getUserMedia({ video: true },
-   //                function (localMediaStream) {
-   //                    video.src = window.URL.createObjectURL(localMediaStream);
-   //                }, handleError);
-   //          }
-			
 
 
 			init();
@@ -257,6 +174,8 @@
 			}
 
 			function onWindowResize() {
+
+				
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
