@@ -56,15 +56,14 @@
 
 		<!-- <script src="OBJLoader3.js"></script> 
 		<script src="house3d.js"></script> -->
-		<script src="mmd/mmdparser.min.js"></script>
+		<!-- <script src="mmd/mmdparser.min.js"></script>
 		<script src="mmd/ammo.js"></script>
 
 		<script src="mmd/TGALoader.js"></script>
 		<script src="mmd/MMDLoader.js"></script>
-		<!-- <script src="js/effects/OutlineEffect.js"></script> -->
 		<script src="mmd/CCDIKSolver.js"></script>
 		<script src="mmd/MMDPhysics.js"></script>
-		<script src="mmd/dat.gui.min.js"></script>
+		<script src="mmd/dat.gui.min.js"></script> -->
 
 		<!-- <script src="js/Detector.js"></script> -->
 		<script src="tool.js"></script>
@@ -139,23 +138,23 @@
 				// scene.background = new THREE.Color( 0xcccccc );
 				// scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
-				// var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
-				// var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
+				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
 
-				// for ( var i = 0; i < 500; i ++ ) {
+				for ( var i = 0; i < 500; i ++ ) {
 
-				// 	var mesh = new THREE.Mesh( geometry, material );
-				// 	mesh.position.x = ( Math.random() - 0.5 ) * 1000;
-				// 	mesh.position.y = ( Math.random() - 0.5 ) * 1000;
-				// 	mesh.position.z = ( Math.random() - 0.5 ) * 1000;
-				// 	mesh.updateMatrix();
-				// 	mesh.matrixAutoUpdate = false;
-				// 	scene.add( mesh );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.5 ) * 20;
+					mesh.position.y = ( Math.random() - 0.5 ) * 20;
+					mesh.position.z = ( Math.random() - 0.5 ) * 20;
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = false;
+					scene.add( mesh );
 
-				// }
+				}
 
 				//loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
-				loadMMD();
+				//loadMMD();
 
 
 				// lights
@@ -174,7 +173,7 @@
 				renderer.setClearAlpha(0.0);
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				
+
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				container = document.getElementById( 'container' );
@@ -373,7 +372,7 @@
 
 			function render() {
 
-				helper.animate( clock.getDelta() );
+				if ( helper !== undefined) helper.animate( clock.getDelta() );
 				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
 				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 
