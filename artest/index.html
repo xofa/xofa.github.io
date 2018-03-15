@@ -54,8 +54,17 @@
 		<script src="jquery.js"></script>
 
 
-		<script src="OBJLoader3.js"></script> 
-		<script src="house3d.js"></script>
+		<!-- <script src="OBJLoader3.js"></script> 
+		<script src="house3d.js"></script> -->
+		<script src="mmd/mmdparser.min.js"></script>
+		<script src="mmd/ammo.js"></script>
+
+		<script src="mmd/TGALoader.js"></script>
+		<script src="mmd/MMDLoader.js"></script>
+		<!-- <script src="js/effects/OutlineEffect.js"></script> -->
+		<script src="mmd/CCDIKSolver.js"></script>
+		<script src="mmd/MMDPhysics.js"></script>
+		<script src="mmd/dat.gui.min.js"></script>
 
 		<!-- <script src="js/Detector.js"></script> -->
 		<script src="tool.js"></script>
@@ -75,6 +84,10 @@
 			var container, stats;
 
 			var camera, controls, scene, renderer;
+
+			var helper, ikHelper, physicsHelper;
+
+			var clock = new THREE.Clock();
 
 			// var arToolkitSource = new THREEx.ArToolkitSource({
 			// 	// to read from the webcam 
@@ -141,8 +154,8 @@
 
 				// }
 
-				loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
-				
+				//loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
+				loadMMD();
 
 
 				// lights
@@ -181,8 +194,129 @@
 
 			}
 
+			function loadMMD(){
+				var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+
+				helper = new THREE.MMDHelper();
+
+				var loader = new THREE.MMDLoader();
+
+				loader.load( modelFile, vmdFiles, function ( object ) {
+
+					mesh = object;
+					mesh.position.y = -10;
+					scene.add( mesh );
+
+					helper.add( mesh );
+					helper.setAnimation( mesh );
+
+					/*
+					 * Note: create CCDIKHelper after calling helper.setAnimation()
+					 */
+					ikHelper = new THREE.CCDIKHelper( mesh );
+					ikHelper.visible = false;
+					scene.add( ikHelper );
+
+					/*
+					 * Note: You're recommended to call helper.setPhysics()
+					 *       after calling helper.setAnimation().
+			 		 */
+					helper.setPhysics( mesh );
+					physicsHelper = new THREE.MMDPhysicsHelper( mesh );
+					physicsHelper.visible = false;
+					scene.add( physicsHelper );
+
+					helper.unifyAnimationDuration( { afterglow: 2.0 } );
+
+					initGui();
+
+				} );
+			}
+
+
+
+			function initGui () {
+
+				var api = {
+					'animation': true,
+					'gradient mapping': false,
+					'ik': true,
+					// 'outline': false,
+					'physics': true,
+					'show IK bones': false,
+					'show rigid bodies': false
+				};
+
+				var gui = new dat.GUI();
+
+				gui.add( api, 'animation' ).onChange( function () {
+					helper.doAnimation = api[ 'animation' ];
+				} );
+
+
+				var phongMaterials;
+				var originalMaterials;
+
+				function makePhongMaterials ( materials ) {
+
+					var array = [];
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var m = new THREE.MeshPhongMaterial();
+						m.copy( materials[ i ] );
+						m.needsUpdate = true;
+
+						array.push( m );
+
+					}
+
+					phongMaterials = array;
+
+				}
+				gui.add( api, 'gradient mapping' ).onChange( function () {
+
+					if ( originalMaterials === undefined ) originalMaterials = mesh.material;
+					if ( phongMaterials === undefined ) makePhongMaterials( mesh.material );
+
+					if ( api[ 'gradient mapping' ] ) {
+
+						mesh.material = originalMaterials;
+
+					} else {
+
+						mesh.material = phongMaterials;
+
+					}
+
+				} );
+
+				gui.add( api, 'ik' ).onChange( function () {
+					helper.doIk = api[ 'ik' ];
+				} );
+
+				// gui.add( api, 'outline' ).onChange( function () {
+				// 	effect.enabled = api[ 'outline' ];
+				// } );
+
+				gui.add( api, 'physics' ).onChange( function () {
+					helper.enablePhysics( api[ 'physics' ] );
+				} );
+
+				gui.add( api, 'show IK bones' ).onChange( function () {
+					ikHelper.visible = api[ 'show IK bones' ];
+				} );
+
+				gui.add( api, 'show rigid bodies' ).onChange( function () {
+					if ( physicsHelper !== undefined ) physicsHelper.visible = api[ 'show rigid bodies' ];
+				} );
+
+			}
+
+
 			function loadModel(id){
-				
+
 				var loader = new House3D.SceneEditor.Loaders.ModelLoader();
 
 				var token = 'A72HjL/ix79l9M1uqGH7SfXhdNtqM81XaRfaTAeXz/2X4p+qW68O1g==';
@@ -243,6 +377,10 @@
 			}
 
 			function render() {
+
+				if ( physicsHelper !== undefined ) helper.animate( clock.getDelta() );
+				if ( physicsHelper !== undefined && physicsHelper.visible ) physicsHelper.update();
+				if ( ikHelper !== undefined && ikHelper.visible ) ikHelper.update();
 
 				renderer.render( scene, camera );
 				stats.update();
