@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>imapic webAR</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#container {
+			position: absolute;
+			  top: 0;
+			  left: 0;
+			  width: 100%;
+			  height: 100%;
+			}
+
+			/*.parent {
+			  position: relative;
+			  width: 1024px;
+			  height: 768px;
+			}
+			#monitor, #mainCanvas {
+			  position: absolute;
+			  top: 0;
+			  left: 0;
+			  width: 100%;
+			  height: 100%;
+			}
+			#monitor {
+			  transform: scaleX(-1);
+			}*/
+		</style>
+	</head>
+
+	<body>
+		<!-- <video autoplay ></video> -->
+		<div id="container"></div>
+
+		<script src="libs/three.js"></script>
+		<script src="libs/OrbitControls.js"></script>
+		<script src="libs/TrackballControls.js"></script>
+		<script src="libs/stats.min.js"></script>
+
+		<script src="jquery.js"></script>
+		<script src="jszip.min.js"></script>
+		<script src="jszip-utils.min.js"></script>
+
+		<script src="OBJLoader3.js"></script> 
+		<script src="house3d.js"></script>
+
+
+		<!-- <script src="js/Detector.js"></script> -->
+		<script src="tool.js"></script>
+		<!-- <script src="libs/ar.js"></script> -->
+
+
+		<script>
+
+			initAR();
+
+			// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+
+
+
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 200;
+				// camera.position.set(0,200,300);
+
+				scene = new THREE.Scene();
+				
+
+				var url = window.location.href;
+				var index = url.indexOf('=');
+
+				if (index !== -1){
+				  url = url.substring(index+1);
+				  loadModel(url);
+				  // loadModel('500E52A3-C014-4608-A0A2-71D12B8787EC');
+				}
+
+
+
+
+				// lights
+				 // var hemiLight = new THREE.HemisphereLight(0xffffff, 0x0f0e0d, 4.2);
+		   //      scene.add(hemiLight);
+
+		        //底部水平光
+		        // var light = new THREE.DirectionalLight(0xffffff, 2.6);
+		        // light.position.set(0, -1, 0);
+		        // light.castShadow = false;
+		        // scene.add(light);
+				var ambient = new THREE.AmbientLight( 0x666666 );
+				scene.add( ambient );
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
+				directionalLight.position.set( -1, 1, 1 ).normalize();
+				scene.add( directionalLight );
+
+				// var spotLight = new THREE.SpotLight( 0x666666 );
+				// spotLight.position.set( 0, 40, 0 );
+				// spotLight.angle = 0.8;
+				// spotLight.intensity = 0.7;
+				// spotLight.penumbra = 0.8;
+				// // spotLight.castShadow = true;
+				// // spotLight.shadow.bias = -0.001;
+
+				// scene.add( spotLight );
+				// scene.add( spotLight.target );
+
+				// var dirLight = new THREE.DirectionalLight( 0x444444 );
+				// dirLight.position.set( 10, 15, 0 );
+				// scene.add( dirLight );
+
+			
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true,alpha: true } );
+				renderer.setClearAlpha(0.0);
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				// renderer.shadowMap.enabled = true;
+				// renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				controls = new THREE.OrbitControls( camera ,renderer.domElement );
+				
+
+				container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				//
+
+			}
+
+
+			function loadModel(id){
+
+				var loader = new House3D.SceneEditor.Loaders.ModelLoader();
+
+				var token = 'A72HjL/ix79l9M1uqGH7SfXhdNtqM81XaRfaTAeXz/2X4p+qW68O1g==';
+				  // var url = "http://192.168.0.130:8088/api/item/getitemgeometry" ; //获取物件
+				var url = "http://101.132.176.37:8059/api/item/getitemgeometry" ; //获取物件
+
+				$.post(url, {UUID: id,Token:token}, function(data,status){
+
+				    var res = data.Data;
+
+				    var itemJson = JSON.parse(res.ItemJson);
+				    itemJson.geometries = JSON.parse(res.GeometryJson);
+
+				    var metadata = {
+				      uuid: itemJson.geometries.UUID,
+				      model: itemJson.geometries.UUID,
+				      position: {x: 0,y: 0,z: 0}
+				    };
+				    
+				    var data = {
+				      model: itemJson,
+				      metadata: metadata
+				    };
+				    loader.createItem1(data,function(item){
+				      // console.log(item);
+				      var box = new THREE.Box3().setFromObject(item);
+				      var center = box.min.clone().add(box.max).multiplyScalar( 0.5 );
+				      var vec = box.max.clone().sub(box.min);
+				      var disMax = Math.max(Math.max(vec.x,vec.y),vec.z);
+				      controls.target.copy(center);
+				      camera.position.set(center.x,center.y,disMax*5.0+center.z);
+				      console.log(box);
+				      // item.matrix.identity();
+				      // item.applyMatrix(matrix);
+				      item.scale.set(0.1,0.1,0.1);
+				      // group.addItem(item);//,
+				      scene.add(item);
+				    });
+				    // var mesh = loader.createItem(data);
+				    // scene.add(mesh);
+
+				});
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				// controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				stats.begin();
+				render();
+				stats.end();
+				controls.update();
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+
+		</script>
+
+	</body>
+</html>
