@@ -234,25 +234,42 @@
 
 			}
 
+			function loadMMDMeshes(url,textureUrl,callback){
+				JSZipUtils.getBinaryContent(preUrl +'luka.zip', function(err, data) {  
+					if(err) { throw err; }  
+
+					var loader = new THREE.MMDLoader();
+				    var zip = new JSZip(data);  
+				    var files = zip.files;
+				    var meshes = [];
+				    for(var key in files){
+				    	var modelStr = zip.file('Luka_Megurine.pmd').asArrayBuffer();
+				    	var mesh = loader.createMesh(loader.parsePmd(modelStr),textureUrl);
+				    	meshes.push(mesh);
+				    }
+			}
+
 			function loadMMD(){
 
-				var modelFile = 'models/mmd/miku/miku_v2.pmd';
-				var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+				// var modelFile = 'models/mmd/miku/miku_v2.pmd';
+				// var vmdFiles = [ 'models/mmd/vmds/wavefile_v2.vmd' ];
+
+				var preUrl = 'models/mmd/miku/';
 
 				helper = new THREE.MMDHelper();
 				var loader = new THREE.MMDLoader();
 
-				// JSZipUtils.getBinaryContent('models/mmd/miku/miku.zip', function(err, data) {  
-				JSZipUtils.getBinaryContent('models/mmd/miku/miku.ht', function(err, data) {  
+				JSZipUtils.getBinaryContent(preUrl +'luka.zip', function(err, data) {  
+				// JSZipUtils.getBinaryContent('models/mmd/miku/miku.ht', function(err, data) {  
 				    if(err) {  
 				        throw err; // or handle err  
 				    }  
 				    var zip = new JSZip(data);  
-				  	
-				    var modelStr = zip.file('miku_v2.pmd').asArrayBuffer(); 
+				  	console.log(zip);
+				    var modelStr = zip.file('Luka_Megurine.pmd').asArrayBuffer(); 
 				    var vmdStr = zip.file('wavefile_v2.vmd').asArrayBuffer(); 
 
-				    var mesh = loader.createMesh(loader.parsePmd(modelStr),'models/mmd/miku/');
+				    var mesh = loader.createMesh(loader.parsePmd(modelStr),preUrl+'lukaImg/');
 				    var vmd = loader.parseVmd(vmdStr);
 
 				    loader.pourVmdIntoModel( mesh, vmd );
