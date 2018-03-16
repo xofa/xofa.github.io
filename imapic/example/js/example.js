@@ -38,12 +38,99 @@ $(document).ready(function() {
     // var imapic3d = new IMAPIC3D.Engine($('#viewer')[0],window.innerWidth,window.innerHeight,window.devicePixelRatio);
     // imapic3d.init();
     // imapic3d.loadFrom2D(str);
+
     linkTo3d(str);
   });
 
 
 
 });
+
+
+var ModelScence = function () {
+  var room;
+  init();
+  function init() {
+    var storey = new House3D.Houses.Storey();
+    room = new House3D.Houses.Room();
+
+    storey._floor = 1;
+    storey.addRoom(room);
+    scene.getHouse().addStorey(storey);
+
+  }
+
+  var arr=[];
+  function addModel(mesh, type) {
+    for(var i = 0; i < arr.length; i++){
+      if(arr[i] == mesh.uuid)
+      {
+        mesh.uuid=mesh.uuid+"_2";
+        //console.log("wall:"+mesh.uuid);
+        break;
+      }
+    }
+
+    let obj = House3D.Models.ModelFactory.build(type);
+    obj.add(mesh);
+
+    //obj.uuid = mesh.uuid;
+
+    let metadata = { "uuid": "", "model": "", "materialId": "" };
+    obj.setMetadata(metadata);
+
+    scene.addModel(obj);
+    room.addObject(obj);
+
+    arr.push(mesh.uuid);
+  }
+
+  // var geometry = new THREE.BoxGeometry(300,300,300);
+  // var mat = new THREE.MeshBasicMaterial({color:0xff0000});
+  // // addModel(new THREE.Mesh(geometry,mat), 'Floor');
+  // scene.addModel(new THREE.Mesh(geometry,mat));
+  // console.log(scene);
+
+  this.addWall = function (mesh) {
+    // console.log(mesh)
+    // scene.add(mesh);
+
+    addModel(mesh, 'Wall');
+    addModel(mesh, 'HangWall');
+  }
+  this.removeWall = function (mesh) { console.log(2) }
+
+  this.addRoof = function (mesh) {
+    console.log(mesh)
+    //scene.add(mesh);
+    
+    addModel(mesh, 'Roof');
+  }
+  this.removeRoof = function (mesh) { console.log(4) }
+
+  this.addFloor = function (mesh) {
+    console.log(mesh)
+    scene.add(mesh);
+    
+    addModel(mesh, 'Floor');
+  }
+  this.removeFloor = function (mesh) { console.log(6) }
+
+  this.addDoor = function(metadata) {
+    console.log(metadata)
+    addItem(metadata);
+  }
+  this.removeDoor = function(metadata) {
+    console.log(8)
+  }
+  this.addWindow = function(metadata) {
+    console.log(metadata)
+    addItem(metadata);
+  }
+  this.removeWindow = function(metadata) {
+    console.log(10)
+  }
+}
 
 
 function linkTo3d(str) {

@@ -120,10 +120,10 @@ var IMAPIC2D;
                 },
                 12: {
                     name: '飘窗',
-                    WIDTH: 160,
-                    _HEIGHT: 240.4,
+                    WIDTH: 181.8,
+                    _HEIGHT: 214,
                     _BOTTOM: 50,
-                    UUID: '1B877694-6AD2-415A-94D8-CA50D2E01C9F'
+                    UUID: '500E52A3-C014-4608-A0A2-71D12B8787EC'
                 }
             }
         },
@@ -141,6 +141,15 @@ var IMAPIC2D;
         ALIGN_LINE: {
             WIDTH: 1.5,
             COLOR: "#00cccc"
+        },
+        CAMERA: {
+            VISIBLE: false,
+            WIDTH: 30,
+            HEIGHT: 30,
+            SRC: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABFCAYAAAD6pOBtAAADuElEQVR4nO2csU/rVhhHT5Dlpzxi9AYkWOwFSocKOtGdTindqiRIlRhrsgB7M4UBVZXoUvgDGBne0iWoEksltnTCZSFVMlQuEkiv6ElIoTRfB+rID5nESRxfp/KR7nRv7vfzUeJ7EzsGWAdcQMbYXOALEsqfjPfg/RISR4ancIjI+IpkMv56iWJKdQDVpAJUB1BNKqBXZ6VSQdM0MplM36ZpGpVKJa7ckSKABDE9PT3QUpfL5QLn8Y1JHD3fAbu7u+i6HmoiXdfZ2dmJJFScpPsA1QFUkwpQHUA1cQt4vnLcAW+Bj2PO0SXuk+BL/AV8BlxFWHYK+CfMoNgQkQ+a67rk83mAN8B3EZV5BXwD/BY6Fy9shKKiVw3Xdf0fh1F4A3xLwI87vTIpF/A8zBBYwA/Ae2+elZUVOT4+/t8L+BQ4Bv72Xr+2tianp6fS6XT61p1kAZ8Dp0AHEE3TpFQqSb1eH6jupAnQgBLwqzc2m83K9va2NBqNoepOioDXwDbwuzdmdnZWqtWq3NzcjFQ3qQJebIuLi3J4eCj39/eR1J0YAaurq3JyciKPj4+R1vX6Yt0JvlQjqL/fa0at6/WlX4ZUB1BNKkB1ANWkAlQHUE0qQHUA1aQCVAdQTSpAdQDVpAJUB1BNKkB1ANWkAlQHUE3iBXQ6nbHOnygB/rvOPBYWFtjf3+f6+npsdRP9q7DXdF2XYrEoZ2dn3Utfo9T1zZ0oAc+ZAr4EfgIevXFLS0tycHAgt7e3Q9edFAF+LGAP3+XvbDYrm5ubcn5+PnDdSRTgoQFfAT/z3wVSQJaXl+Xo6Eju7u5C1R1YQLPZFNu2xTRN0XVdTNMU27al2WzGLcDPIvA9cOPNkcvlxLZtqdfr0Qmo1WpiGEbgyWlmZkZqtdrQAiK6Q+QV8DXwS1DGkQS0Wq3uwRcKBXEcR9rttlxcXEihUBBADMOQVqs1sADXdSWfz3v9b0cQ4OcT4EfgXZCMgNZbwNbWlgCysbER2F8sFgWQcrncV0CP9g74KCIBHq8jEWCapgByeXkZ2O84jgBiWdYwAt6j+D5B6CNA13UB5OHhIbC/3W53NyohBCSOvlvhubk5ABqNRmD/1dXTvY3z8/MRxoqPvgLW19cBqFargf17e3sfjJtEQq8CpVKpuwo4jtM9AYZdBZQeZQ9G2gcYhhF6H6DuEHsz0E7QsizRdV0sy5JyuTzQTlDxcQaS/mVGdQDVpAJUB1BNKkB1gCTwB+G+NY3aEvkECXh6hsi4H6OR2GeI/AtOZsG/U3VnTAAAAABJRU5ErkJggg==',
+            COLOR: '#6A6A6A',
+            RADIUS: 110,
+            ALPHA: 0.7
         }
     };
 })(IMAPIC2D || (IMAPIC2D = {}));
@@ -1200,9 +1209,45 @@ var IMAPIC2D;
 (function (IMAPIC2D) {
     var Items;
     (function (Items) {
+        var Camera = (function (_super) {
+            __extends(Camera, _super);
+            function Camera(x, y) {
+                var _this = _super.call(this, x, y) || this;
+                _this.rotate = 45;
+                _this.angles = 80;
+                return _this;
+            }
+            Camera.prototype.getPosition = function () {
+                return new IMAPIC2D.Vec2(this.x, this.y);
+            };
+            Camera.prototype.distanceFromPoint = function (point) {
+                return this.getPosition().distanceTo(point);
+            };
+            Camera.prototype.move = function (newX, newY) {
+                this.x = newX;
+                this.y = newY;
+                return true;
+            };
+            Camera.prototype.drag = function (point) {
+                var rotate = Math.atan(point.y / point.x) * 180 / Math.PI;
+                if (point.x < 0) {
+                    rotate = rotate + 180;
+                }
+                this.rotate = rotate;
+            };
+            return Camera;
+        }(IMAPIC2D.Vec2));
+        Items.Camera = Camera;
+    })(Items = IMAPIC2D.Items || (IMAPIC2D.Items = {}));
+})(IMAPIC2D || (IMAPIC2D = {}));
+var IMAPIC2D;
+(function (IMAPIC2D) {
+    var Items;
+    (function (Items) {
         var Floorplan = (function () {
             function Floorplan() {
                 this.index = 0;
+                this.cameraList = [];
                 this.cornerList = [];
                 this.wallList = [];
                 this.roomList = [];
@@ -1230,6 +1275,32 @@ var IMAPIC2D;
             Floorplan.prototype.hoverOnItem = function (pos, items) {
                 for (var i = 0; i < items.length; i++) {
                     if (items[i].distanceFromPoint(pos) < IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER) {
+                        return items[i];
+                    }
+                }
+                return null;
+            };
+            Floorplan.prototype.cameraHoverOnItem = function (pos, items) {
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].distanceFromPoint(pos) < 80) {
+                        return items[i];
+                    }
+                }
+                return null;
+            };
+            Floorplan.prototype.sectorHoverOnItem = function (pos, items) {
+                for (var i = 0; i < items.length; i++) {
+                    var slope = new IMAPIC2D.Line(items[i], pos).slope();
+                    var angleA = items[i].rotate - items[i].angles / 2;
+                    this.pointA = new IMAPIC2D.Vec2(Math.cos(angleA * Math.PI / 180) * IMAPIC2D._DEFINES_.CAMERA.RADIUS + items[i].x, Math.sin(angleA * Math.PI / 180) * IMAPIC2D._DEFINES_.CAMERA.RADIUS + items[i].y);
+                    var slopeA = new IMAPIC2D.Line(items[i], this.pointA).slope();
+                    var angleB = items[i].rotate + items[i].angles / 2;
+                    this.pointB = new IMAPIC2D.Vec2(Math.cos(angleB * Math.PI / 180) * IMAPIC2D._DEFINES_.CAMERA.RADIUS + items[i].x, Math.sin(angleB * Math.PI / 180) * IMAPIC2D._DEFINES_.CAMERA.RADIUS + items[i].y);
+                    var slopeB = new IMAPIC2D.Line(items[i], this.pointB).slope();
+                    var rangeA = (slope - slopeA) / (1 + slopeA * slope);
+                    var rangeB = (slopeB - slope) / (1 + slopeB * slope);
+                    var length = new IMAPIC2D.Line(items[i], pos).length();
+                    if (rangeA > 0 && rangeB > 0 && length <= IMAPIC2D._DEFINES_.CAMERA.RADIUS * 2) {
                         return items[i];
                     }
                 }
@@ -1323,6 +1394,14 @@ var IMAPIC2D;
             };
             Floorplan.prototype.getInWall = function () {
                 return this.inWallList;
+            };
+            Floorplan.prototype.newCamera = function (x, y) {
+                this.camera = new Items.Camera(x, y);
+                this.cameraList.push(this.camera);
+                return this.camera;
+            };
+            Floorplan.prototype.getCamera = function () {
+                return this.cameraList;
             };
             Floorplan.prototype.newRoom = function (corners, id) {
                 var room = new Items.Room(corners, id);
@@ -1843,7 +1922,9 @@ var IMAPIC2D;
                     corner: null,
                     wall: null,
                     inWall: null,
-                    room: null
+                    room: null,
+                    camera: null,
+                    sector: null
                 };
                 this.origin = new IMAPIC2D.Vec2();
                 this.target = new IMAPIC2D.Vec2();
@@ -1870,6 +1951,9 @@ var IMAPIC2D;
                 this.canvasJQ.bind("mousemove", function (event) { scope.mousemove(event); });
                 this.canvasJQ.bind("mouseup", function (event) { scope.mouseup(event); });
                 this.canvasJQ.bind("mouseleave", function () { scope.mouseleave(); });
+                if (IMAPIC2D._DEFINES_.CAMERA.VISIBLE) {
+                    this.floorplan.newCamera(this.target.x, this.target.y);
+                }
                 this.canvasDOM.addEventListener('wheel', function (event) { scope.mousewheel(event); }, false);
                 $(window).resize(function () { scope.handleWindowResize(); });
                 $(document).keyup(function (e) {
@@ -1915,7 +1999,7 @@ var IMAPIC2D;
                 this.updateTarget();
             };
             Handle.prototype.noAcitve = function () {
-                return this.active.corner == null && this.active.inWall == null && this.active.wall == null;
+                return this.active.corner == null && this.active.inWall == null && this.active.wall == null && this.active.camera == null && this.active.sector == null;
             };
             Handle.prototype.updateTarget = function () {
                 var corners = this.floorplan.getCorners();
@@ -2067,7 +2151,7 @@ var IMAPIC2D;
                     mouseCursorStr = mouseCursorStr;
                 }
                 else {
-                    if (this.active.corner !== null || this.active.inWall !== null) {
+                    if (this.active.corner !== null || this.active.inWall !== null || this.active.camera !== null || this.active.sector !== null) {
                         mouseCursorStr = 'move';
                     }
                     else if (this.active.wall !== null) {
@@ -2113,8 +2197,8 @@ var IMAPIC2D;
                                 }
                             });
                             var updateRooms = [];
-                            var _startCorner = this.active.wall.getStart();
-                            var _endCorner = this.active.wall.getEnd();
+                            var _startCorner = activeWall.getStart();
+                            var _endCorner = activeWall.getEnd();
                             this.floorplan.getRooms().forEach(function (room) {
                                 var corners = room.corners;
                                 for (var i = 0; i < corners.length; i++) {
@@ -2139,22 +2223,12 @@ var IMAPIC2D;
                                 }
                             }
                             var needMove = true;
-                            var items = curInWall.wall.onItems;
+                            var items = attachedWall.onItems;
                             for (var i = 0; i < items.length; i++) {
                                 var inwall = items[i];
-                                if (inwall.getLine().center().distanceTo(this.curMouse) < (inwall.getLength() + curInWall.getLength()) / 2.0) {
+                                if ((inwall != curInWall) && (inwall.getLine().center().distanceTo(this.curMouse) < (inwall.getLength() + curInWall.getLength()) / 2.0)) {
                                     needMove = false;
                                     break;
-                                }
-                            }
-                            if (needMove && attachedWall !== curInWall.wall) {
-                                var _items = attachedWall.onItems;
-                                for (var i = 0; i < _items.length; i++) {
-                                    var inwall = _items[i];
-                                    if (inwall.getLine().center().distanceTo(this.curMouse) < (inwall.getLength() + curInWall.getLength()) / 2.0) {
-                                        needMove = false;
-                                        break;
-                                    }
                                 }
                             }
                             if (needMove) {
@@ -2164,10 +2238,19 @@ var IMAPIC2D;
                                 this.active.inWall.relativeMove(this.curMouse.x, this.curMouse.y);
                             }
                         }
+                        else if (this.active.camera) {
+                            this.active.camera.move(this.curMouse.x + IMAPIC2D._DEFINES_.CAMERA.WIDTH, this.curMouse.y);
+                        }
+                        else if (this.active.sector) {
+                            var point = new IMAPIC2D.Vec2(this.curMouse.x - this.floorplan.camera.x, this.curMouse.y - this.floorplan.camera.y);
+                            this.floorplan.camera.drag(point);
+                        }
                     }
                 }
                 else {
                     if (this.mode != IMAPIC2D._DEFINES_.EVENTS.DRAW) {
+                        this.active.camera = this.getCameraActiveItem(this.floorplan.getCamera(), this.active.camera);
+                        this.active.sector = this.getSectorActiveItem(this.floorplan.getCamera(), this.active.sector);
                         this.active.corner = this.getActiveItem(this.floorplan.getCorners(), this.active.corner);
                         if (this.active.corner == null) {
                             this.active.inWall = this.getActiveItem(this.floorplan.getInWall(), this.active.inWall);
@@ -2203,6 +2286,24 @@ var IMAPIC2D;
             };
             Handle.prototype.getActiveItem = function (items, curItem) {
                 var hover = this.floorplan.hoverOnItem(this.curMouse, items);
+                if (hover != curItem) {
+                    this.needUpdate = true;
+                    return hover;
+                }
+                this.needUpdate = false;
+                return curItem;
+            };
+            Handle.prototype.getCameraActiveItem = function (items, curItem) {
+                var hover = this.floorplan.cameraHoverOnItem(this.curMouse, items);
+                if (hover != curItem) {
+                    this.needUpdate = true;
+                    return hover;
+                }
+                this.needUpdate = false;
+                return curItem;
+            };
+            Handle.prototype.getSectorActiveItem = function (items, curItem) {
+                var hover = this.floorplan.sectorHoverOnItem(this.curMouse, items);
                 if (hover != curItem) {
                     this.needUpdate = true;
                     return hover;
@@ -2359,6 +2460,25 @@ var IMAPIC2D;
                 this.context.stroke();
                 this.context.closePath();
             };
+            Draw.prototype.drawCamera = function (image, camera, relative, angle, rotate) {
+                this.context.save();
+                this.context.translate(relative.x, relative.y);
+                this.context.rotate(rotate * Math.PI / 180);
+                this.context.translate(-relative.x, -relative.y);
+                this.context.drawImage(image, relative.x - camera.WIDTH, relative.y - camera.HEIGHT / 2, camera.WIDTH, camera.HEIGHT);
+                this.context.save();
+                this.context.translate(relative.x, relative.y);
+                this.context.rotate(-angle / 2 * Math.PI / 180);
+                this.context.translate(-relative.x, -relative.y);
+                this.context.beginPath();
+                this.context.moveTo(relative.x, relative.y);
+                this.context.arc(relative.x, relative.y, camera.RADIUS, 0, angle * Math.PI / 180);
+                this.context.restore();
+                this.context.fillStyle = camera.COLOR;
+                this.context.globalAlpha = camera.ALPHA;
+                this.context.fill();
+                this.context.restore();
+            };
             return Draw;
         }());
         Core.Draw = Draw;
@@ -2368,12 +2488,18 @@ var IMAPIC2D;
 (function (IMAPIC2D) {
     var Engine = (function () {
         function Engine(options) {
+            var _this = this;
             this.canvasId = options.canvasId;
             this.wallSettingId = options.wallSettingDivId;
             this.roomSettingId = options.roomSettingDivId;
             this.canvasElement = document.getElementById(options.canvasId);
             this.context = this.canvasElement.getContext('2d');
             this.drawBasic = new IMAPIC2D.Core.Draw(this.context);
+            this.CameraImage = new Image();
+            this.CameraImage.src = IMAPIC2D._DEFINES_.CAMERA.SRC;
+            this.CameraImage.onload = function () {
+                _this.draw();
+            };
             this.floorplan = new IMAPIC2D.Items.Floorplan();
             this.handle = new IMAPIC2D.EventHandle.Handle(this, this.floorplan);
             this.handle.handleWindowResize();
@@ -2393,6 +2519,9 @@ var IMAPIC2D;
             });
             this.drawCenter(this.handle.origin);
             this.drawWalls(this.floorplan.getWalls());
+            if (IMAPIC2D._DEFINES_.CAMERA.VISIBLE) {
+                this.drawCamera(this.floorplan.getCamera());
+            }
             this.drawCorners(this.floorplan.getCorners());
             this.drawWallLabels(this.floorplan.getWalls());
             this.floorplan.getInWall().forEach(function (inWallItem) {
@@ -2577,6 +2706,17 @@ var IMAPIC2D;
                 this.drawBasic.drawCircle(pixelPos, radius, color);
             }
         };
+        Engine.prototype.drawCamera = function (camera) {
+            var _this = this;
+            if (camera.length < 1)
+                return;
+            camera.forEach(function (cameras) {
+                var pixelPos = _this.handle.convert(cameras.x, cameras.y);
+                if (pixelPos.x !== 0) {
+                    _this.drawBasic.drawCamera(_this.CameraImage, IMAPIC2D._DEFINES_.CAMERA, pixelPos, cameras.angles, cameras.rotate);
+                }
+            });
+        };
         Engine.prototype.drawItem = function (item) {
             var hover = (item === this.handle.active.inWall);
             var color = this.getColorByState(hover, IMAPIC2D._DEFINES_.IN_WALL);
@@ -2735,9 +2875,6 @@ var IMAPIC3D;
             points.push(new THREE.Vector2(0, 0));
             points.push(new THREE.Vector2(w, 0));
             points.push(new THREE.Vector2(w, h));
-            if (THREE.ShapeUtils.isClockWise(points)) {
-                points.reverse();
-            }
             return new THREE.Shape(points);
         };
         RoomGenerator.prototype.pushHolesToShape = function (shape, holes, isEdge1) {
@@ -2782,7 +2919,11 @@ var IMAPIC3D;
             var minDistance = 0.01;
             var bot = botDistance !== undefined ? botDistance : 0.0;
             if (bot > minDistance || botDistance === undefined) {
-                var mesh = new THREE.Mesh(geo, mat);
+                var mat1 = mat.clone();
+                if (mat1.side == THREE.FrontSide) {
+                    mat1.side = THREE.BackSide;
+                }
+                var mesh = new THREE.Mesh(geo, mat1);
                 mesh.translateY(bot);
                 callback(mesh, 'Wall');
             }
@@ -2833,9 +2974,6 @@ var IMAPIC3D;
             var scope = this;
             var _starts = wall.start;
             var _ends = wall.end;
-            var _height = wall.height;
-            var _width = wall.width;
-            var _side = wall.side;
             var matFront = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x333333, shininess: 20 });
             var matBack = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x333333, shininess: 20, side: THREE.BackSide });
             var matDouble = new THREE.MeshPhongMaterial({ color: 0xffffff, specular: 0x333333, shininess: 20, side: THREE.DoubleSide });
@@ -2844,11 +2982,11 @@ var IMAPIC3D;
             this.addTopBot(pnts, wall.height, matDouble, undefined, undefined, callback);
             this.addWallCornerStripMesh(_starts, wall.height, matFront, callback);
             this.addWallCornerStripMesh(_ends, wall.height, matFront, callback);
-            var mat1 = _side == 0 ? matFront : _side == 1 ? matBack : matDouble;
+            var mat1 = wall.side == 0 ? matFront : wall.side == 1 ? matBack : matDouble;
             var holes = inWalls;
             var pnts1 = this.addWallInOutEdgeMesh(_starts[_starts.length - 1], _ends[0], wall.height, mat1, holes, true, callback);
             var pnts2 = this.addWallInOutEdgeMesh(_starts[0], _ends[_ends.length - 1], wall.height, mat1, holes, false, callback);
-            this.addHoleMesh(pnts1, pnts2, wall.height, wall.width, matHoleDouble, callback);
+            this.addHoleMesh(pnts1, pnts2, wall.height, wall.width, matFront, callback);
         };
         RoomGenerator.prototype.generateRoom = function (room, callback) {
             var shape = new THREE.Shape();
