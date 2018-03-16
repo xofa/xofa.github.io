@@ -12,7 +12,7 @@
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #000;
+				background-color: #fff;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -53,12 +53,12 @@
 		<script src="libs/stats.min.js"></script>
 
 		<script src="jquery.js"></script>
-		<!-- <script src="jszip.min.js"></script>
-		<script src="jszip-utils.min.js"></script> -->
+		<script src="jszip.min.js"></script>
+		<script src="jszip-utils.min.js"></script>
 
 		<!-- <script src="OBJLoader3.js"></script> 
 		<script src="house3d.js"></script> -->
-		<script src="mmd/mmdparser.min.js"></script>
+		<script src="mmd/mmdparser.js"></script>
 		<script src="mmd/ammo.js"></script>
 
 		<script src="mmd/TGALoader.js"></script>
@@ -78,7 +78,7 @@
 
 		<script>
 
-			initAR();
+			// initAR();
 
 			// if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -161,13 +161,52 @@
 
 				// lights
 
-				var ambient = new THREE.AmbientLight( 0x666666 );
-				scene.add( ambient );
+				// var ambient = new THREE.AmbientLight( 0x666666 );
+				// scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0x887766 );
-				directionalLight.position.set( -1, 1, 1 ).normalize();
-				scene.add( directionalLight );
+				// var directionalLight = new THREE.DirectionalLight( 0x887766 );
+				// directionalLight.position.set( -1, 1, 1 ).normalize();
+				// scene.add( directionalLight );
 
+				var spotLight = new THREE.SpotLight( 0x666666 );
+				spotLight.position.set( 0, 40, 0 );
+				spotLight.angle = 0.8;
+				spotLight.intensity = 0.7;
+				spotLight.penumbra = 0.8;
+				// spotLight.castShadow = true;
+				// spotLight.shadow.bias = -0.001;
+
+				scene.add( spotLight );
+				scene.add( spotLight.target );
+
+				var dirLight = new THREE.DirectionalLight( 0x444444 );
+				dirLight.position.set( 10, 15, 0 );
+				scene.add( dirLight );
+
+				// // Shadow parameters
+				// dirLight.castShadow = true;
+				// dirLight.shadow.camera.near = 1;
+				// dirLight.shadow.camera.far = 40;
+				// dirLight.shadow.camera.right = 20;
+				// dirLight.shadow.camera.left = - 20;
+				// dirLight.shadow.camera.top	= 40;
+				// dirLight.shadow.camera.bottom = - 40;
+				// dirLight.shadow.mapSize.width = 1024;
+				// dirLight.shadow.mapSize.height = 1024;
+				// dirLight.shadow.bias = -0.4;
+
+				// var camHelper = new THREE.CameraHelper(dirLight.shadow.camera);
+				// scene.add(camHelper);
+				// // Model specific Shadow parameters
+
+				// var ground = new THREE.Mesh(
+				// 	new THREE.CircleBufferGeometry( 50, 32 ),
+				// 	new THREE.MeshPhongMaterial( { color: 0xffffff, side: THREE.FrontSide,transparent:true,opacity:0.9 } )
+				// );
+				// ground.rotation.x = -90 * Math.PI / 180;
+				// ground.position.y = -10;
+				// ground.receiveShadow = true;
+				// scene.add( ground );
 
 				// renderer
 
@@ -175,6 +214,9 @@
 				renderer.setClearAlpha(0.0);
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				// renderer.shadowMap.enabled = true;
+				// renderer.shadowMap.type = THREE.PCFShadowMap;
 
 				controls = new THREE.OrbitControls( camera ,renderer.domElement );
 				
@@ -201,32 +243,39 @@
 				var loader = new THREE.MMDLoader();
 
 				// JSZipUtils.getBinaryContent('models/mmd/miku/miku.zip', function(err, data) {  
-				//     if(err) {  
-				//         throw err; // or handle err  
-				//     }  
-				//     var zip = new JSZip(data);  
+				JSZipUtils.getBinaryContent('models/mmd/miku/miku.ht', function(err, data) {  
+				    if(err) {  
+				        throw err; // or handle err  
+				    }  
+				    var zip = new JSZip(data);  
 				  	
-				//     var modelStr = zip.file('miku_v2.pmd').asText(); 
-				//     var vmdStr = zip.file('wavefile_v2.vmd').asText(); 
+				    var modelStr = zip.file('miku_v2.pmd').asArrayBuffer(); 
+				    var vmdStr = zip.file('wavefile_v2.vmd').asArrayBuffer(); 
 
-				//     var mesh = loader.parsePmd(modelStr);
+				    var mesh = loader.createMesh(loader.parsePmd(modelStr),'models/mmd/miku/');
+				    var vmd = loader.parseVmd(vmdStr);
 
-				//     this.loadModel( modelUrl, function ( mesh ) {
+				    loader.pourVmdIntoModel( mesh, vmd );
 
-				// 		scope.loadVmds( vmdUrls, function ( vmd ) {
+				    onLoad( mesh );
 
-				// 			scope.pourVmdIntoModel( mesh, vmd );
-				// 			onLoad( mesh );
+				 //    this.loadModel( modelUrl, function ( mesh ) {
 
-				// 		} );
+					// 	scope.loadVmds( vmdUrls, function ( vmd ) {
 
-				// 	} );
+					// 		scope.pourVmdIntoModel( mesh, vmd );
+					// 		onLoad( mesh );
+
+					// 	} );
+
+					// } );
 
 
-				// });
-				loader.load( modelFile, vmdFiles, onLoad);
+				});
+				// loader.load( modelFile, vmdFiles, onLoad);
 				function onLoad(mesh){
 
+					// mesh.castShadow = true;
 					mesh.position.y = -10;
 					scene.add( mesh );
 
