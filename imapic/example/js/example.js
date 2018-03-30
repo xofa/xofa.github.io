@@ -58,16 +58,9 @@ $(document).ready(function() {
 
 
 
-  window.addEventListener("orientationchange", function() { 
-    editor.resize(window.innerWidth, window.innerHeight);
-  }, false); 
-  
-  window.addEventListener("resize", function () {
-    editor.resize(window.innerWidth, window.innerHeight);
-  });
-  editor.resize(window.innerWidth, window.innerHeight);
 
-});
+
+
 
 
 var ModelScence = function () {
@@ -256,7 +249,14 @@ function linkTo3d(str,engine2d) {
   // editor._scene.position.sub(center.x,0,center.y);
 
 
-
+  window.addEventListener("orientationchange", function() { 
+    editor.resize(window.innerWidth, window.innerHeight);
+  }, false); 
+  
+  window.addEventListener("resize", function () {
+    editor.resize(window.innerWidth, window.innerHeight);
+  });
+  editor.resize(window.innerWidth, window.innerHeight);
 
 
 }
@@ -400,6 +400,9 @@ function viewer(engine) {
 
     $( window ).resize( scope.handleWindowResize );
     // document.addEventListener('resize',scope.handleWindowResize());
+    window.addEventListener("orientationchange", function() { 
+      scope.handleWindowResize();
+    }, false); 
     scope.handleWindowResize();
 
     // mode buttons
