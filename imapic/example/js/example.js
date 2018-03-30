@@ -9,8 +9,6 @@ $(document).ready(function() {
       }
   );
 
-
-
   // main setup
   var opts = {
     canvasId: 'canvas2d',
@@ -18,7 +16,7 @@ $(document).ready(function() {
     wallSettingDivId: 'wallSetting',
     roomSettingDivId: 'roomSetting',
 
-  }
+  };
   var engine = new IMAPIC2D.Engine(opts);
   new viewer(engine).init();
 
@@ -57,7 +55,7 @@ $(document).ready(function() {
   });
 
 
-
+});
 
 
 
@@ -146,7 +144,7 @@ var ModelScence = function () {
   this.removeWindow = function(metadata) {
     console.log(10)
   }
-}
+};
 
 
 function linkTo3d(str,engine2d) {
@@ -401,7 +399,7 @@ function viewer(engine) {
     $( window ).resize( scope.handleWindowResize );
     // document.addEventListener('resize',scope.handleWindowResize());
     window.addEventListener("orientationchange", function() { 
-      scope.handleWindowResize();
+      scope.eventHandle.resizeView();
     }, false); 
     scope.handleWindowResize();
 
