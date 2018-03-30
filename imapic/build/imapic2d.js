@@ -2190,7 +2190,7 @@ var IMAPIC2D;
                         var dx = event.touches[0].pageX - event.touches[1].pageX;
                         var dy = event.touches[0].pageY - event.touches[1].pageY;
                         var distance = Math.sqrt(dx * dx + dy * dy);
-                        this.handleScale(distance - this.scalePre);
+                        this.handleScale(this.scalePre - distance);
                         this.scalePre = distance;
                         break;
                 }
