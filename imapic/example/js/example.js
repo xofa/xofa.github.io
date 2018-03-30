@@ -9,6 +9,8 @@ $(document).ready(function() {
       }
   );
 
+
+
   // main setup
   var opts = {
     canvasId: 'canvas2d',
@@ -28,6 +30,9 @@ $(document).ready(function() {
   engine.draw();
 
 
+
+
+
   $('#roomSetting a').click( function(){
     engine.setRoomName($(this).text());
   });
@@ -35,6 +40,8 @@ $(document).ready(function() {
   $('#roomSettingClose').click(function(){
     $('#roomSetting').css('display','none');
   });
+
+
         
 
   $('#update-floorplan').click(function(){
@@ -50,6 +57,15 @@ $(document).ready(function() {
   });
 
 
+
+  window.addEventListener("orientationchange", function() { 
+    editor.resize(window.innerWidth, window.innerHeight);
+  }, false); 
+  
+  window.addEventListener("resize", function () {
+    editor.resize(window.innerWidth, window.innerHeight);
+  });
+  editor.resize(window.innerWidth, window.innerHeight);
 
 });
 
@@ -239,12 +255,6 @@ function linkTo3d(str,engine2d) {
   control.update();
   // editor._scene.position.sub(center.x,0,center.y);
 
-
-
-  window.addEventListener("resize", function () {
-    editor.resize(window.innerWidth, window.innerHeight);
-  });
-  editor.resize(window.innerWidth, window.innerHeight);
 
 
 
