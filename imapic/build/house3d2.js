@@ -293,8 +293,10 @@ var House3D;
                     this._metadata.materialId = materialId;
                     this.traverse(function (child) {
                         if (child instanceof THREE.Mesh) {
+                            var side = child.material.side;
                             child.material.dispose();
                             child.material = material;
+                            // child.material.side = side;
                             child.material.needsUpdate = true;
                         }
                     });
@@ -366,7 +368,6 @@ var House3D;
                     _this._inWallEnable = false;
                     _this._onItemEnable = false;
                     _this._allowPlacement = true;
-                    _this.labelMesh = undefined;
                     _this.type = "Item";
                     _this._rotatable = false;
                     _this._movable = false;
@@ -477,22 +478,6 @@ var House3D;
                         this._metadata.scale = data.scale;
                 };
                 Item.prototype.modifyMaterial = function (material) {
-                };
-                Item.prototype.updateLabel = function (modelStr) {
-                    if (this.labelMesh == undefined && modelStr == this._metadata.model) {
-                        var box = this.getBox();
-                        var pos = new THREE.Vector3();
-                        pos.x = (box.max.x + box.min.x) / 2.0;
-                        pos.z = (box.max.z + box.min.z) / 2.0;
-                        pos.y = box.max.y;
-                        this.labelMesh = new THREE.Mesh(new THREE.SphereBufferGeometry(5, 5, 5));
-                        this.add(this.labelMesh);
-                    }
-                };
-                Item.prototype.showLabelMesh = function (value) {
-                    if (this.labelMesh !== undefined) {
-                        this.labelMesh.visible = value;
-                    }
                 };
                 return Item;
             }(House3D.Object3D));
@@ -1005,9 +990,11 @@ var House3D;
             }
             MoveItemCmd.prototype.undo = function () {
                 this.selectedObj.position.copy(this.prePos);
+                console.log(this.prePos);
             };
             MoveItemCmd.prototype.redo = function () {
                 this.selectedObj.position.copy(this.curPos);
+                console.log(this.curPos);
             };
             return MoveItemCmd;
         }(UndoRedo.Command));
@@ -1024,8 +1011,6 @@ var House3D;
                 this._storeys = {};
                 this._combinationStart = false;
                 this._selectItems = [];
-                this.mouseX = 0;
-                this.mouseY = 0;
                 this._metadata = new House3D.HouseTypeData();
             }
             House.prototype.setControls = function (control) {
@@ -1319,16 +1304,6 @@ var House3D;
                     }
                 }
                 return false;
-            };
-            House.prototype.setMouseDownPos = function (x, y) {
-                this.mouseX = x;
-                this.mouseY = y;
-            };
-            House.prototype.getMouseDownPos = function () {
-                return {
-                    x: this.mouseX,
-                    y: this.mouseY,
-                };
             };
             return House;
         }());
@@ -1814,7 +1789,6 @@ var House3D;
                     var _this = _super.call(this) || this;
                     _this.type = "DecorateItem";
                     _this._selectable = true;
-                    _this._onFloorEnable = true;
                     return _this;
                 }
                 DecorateItem.prototype.clone = function (recursive) {
@@ -2053,54 +2027,36 @@ var House3D;
                 House.prototype.init_itemmenu = function (container) {
                     var _this = this;
                     this._itemMenu = document.createElement('div');
-                    this._itemMenu.setAttribute("style", "position:absolute; display:none;backgroundColor:#666666;width:250px ");
+                    this._itemMenu.setAttribute("style", "position:absolute; display:none;backgroundColor:#666666; ");
                     container.appendChild(this._itemMenu);
-                    var imgTranlate = document.createElement('img');
-                    imgTranlate.id = 'imgitem_translate';
-                    imgTranlate.src = '/static/images/translate.png';
-                    imgTranlate.width = 32;
-                    imgTranlate.style.backgroundColor = '#666666';
-                    this._itemMenu.appendChild(imgTranlate);
-                    var imgRotate = document.createElement('img');
-                    imgRotate.id = 'imgitem_rotate';
-                    imgRotate.src = '/static/images/rotate.png';
-                    imgRotate.width = 32;
-                    imgRotate.style.backgroundColor = '#666666';
-                    this._itemMenu.appendChild(imgRotate);
-                    var imgZoom = document.createElement('img');
-                    imgZoom.id = 'imgitem_scale';
-                    imgZoom.src = '/static/images/zoom.png';
-                    imgZoom.width = 32;
-                    imgZoom.style.backgroundColor = '#666666';
-                    this._itemMenu.appendChild(imgZoom);
                     var menuJSON = {
                         delete: {
                             id: "imgitem_delete",
-                            src: "/static/images/delete.png",
+                            src: "./images/delete.png",
                         },
                         modifyColor: {
                             id: "imgitem_modifycolor",
-                            src: "/static/images/modifycolor.png",
+                            src: "./images/modifycolor.png",
                         },
                         modifyModel: {
                             id: "imgitem_modifymodel",
-                            src: "/static/images/modifymodel.png",
+                            src: "./images/modifymodel.png",
                         },
                         copyModel: {
                             id: "imgitem_copymodel",
-                            src: "/static/images/copying.png",
+                            src: "./images/copying.png",
                         },
                         separation: {
                             id: "imgitem_separation",
-                            src: "/static/images/group_delete.png",
+                            src: "./images/group_delete.png",
                         },
                         combination: {
                             id: "imgitem_combination",
-                            src: "/static/images/group_add.png",
+                            src: "./images/group_add.png",
                         },
                         detail: {
                             id: "imgitem_detail",
-                            src: "/static/images/detail.png",
+                            src: "./images/detail.png",
                         }
                     };
                     var scope = this;
@@ -2108,7 +2064,7 @@ var House3D;
                         var div = document.createElement('img');
                         div.id = item.id;
                         div.src = item.src;
-                        div.setAttribute("style", "backgroundColor:#666666;float:left;width:24px");
+                        div.setAttribute("style", "backgroundColor:#666666;float:left;width:32px");
                         scope._itemMenu.appendChild(div);
                         return div;
                     }
@@ -2185,13 +2141,13 @@ var House3D;
                     container.appendChild(this._buildMenu);
                     var imgModifyColor = document.createElement('img');
                     imgModifyColor.id = 'imgbuild_modifycolor';
-                    imgModifyColor.src = '/static/images/modifycolor.png';
+                    imgModifyColor.src = './images/modifycolor.png';
                     imgModifyColor.width = 32;
                     imgModifyColor.setAttribute("style", "backgroundColor:#666666; float:left;");
                     this._buildMenu.appendChild(imgModifyColor);
                     var imgDetail = document.createElement('img');
                     imgDetail.id = "imgbuild_detail";
-                    imgDetail.src = "/static/images/detail.png";
+                    imgDetail.src = "./images/detail.png";
                     imgDetail.width = 32;
                     imgDetail.setAttribute("style", "backgroundColor:#666666; float:left;");
                     this._buildMenu.appendChild(imgDetail);
@@ -2252,30 +2208,6 @@ var House3D;
                         else
                             id.style.display = "none";
                 };
-                House.prototype.showMenuFunc = function (func) {
-                    if (this._selectObject) {
-                        if (this._selectObject.type.indexOf("Item") >= 0) {
-                            var item = this._selectObject;
-                            var selectable = item.getSelectable();
-                            if (selectable === true) {
-                                func(item.getMetadata(), this._selectObject.type);
-                            }
-                            else {
-                                this.hideMenu();
-                            }
-                        }
-                        else {
-                        }
-                    }
-                };
-                House.prototype.calcMenuPosition = function (element) {
-                    var totalWidth = window.innerWidth;
-                    var pos = this.getMouseDownPos();
-                    pos.x = totalWidth - pos.x < 100 ? totalWidth - 100 : pos.x + 40;
-                    element.style.left = pos.x + 'px';
-                    element.style.top = pos.y + 'px';
-                    element.style.display = 'block';
-                };
                 House.prototype.showMenu = function () {
                     if (this._selectObject) {
                         if (this._selectObject.type.indexOf("Item") >= 0) {
@@ -2283,7 +2215,7 @@ var House3D;
                             var selectable = item.getSelectable();
                             if (selectable === true) {
                                 this._buildMenu.style.display = 'none';
-                                this.calcMenuPosition(this._itemMenu);
+                                this.calcItemMenu(this._itemMenu, item);
                                 if (this._combinationStart && this._selectItems.length > 1) {
                                     this.elementDisplay("imgitem_delete", false);
                                     this.elementDisplay("imgitem_modifycolor", false);
@@ -2315,7 +2247,7 @@ var House3D;
                         }
                         else {
                             this._itemMenu.style.display = 'none';
-                            this.calcMenuPosition(this._buildMenu);
+                            this.calcBuildMenu(this._buildMenu, this._selectObject);
                         }
                     }
                 };
@@ -2628,10 +2560,7 @@ var House3D;
                             state.geometries[i].data.attributes = attributes;
                         }
                         for (var i = 0; i < state.textures.length; i++) {
-                            var wrap = state.textures[i].wrap;
-                            if (wrap[0] == null || wrap[1] == null) {
-                                state.textures[i].wrap = [1000, 1000];
-                            }
+                            state.textures[i].wrap = undefined;
                         }
                         return state;
                     }
@@ -2955,15 +2884,19 @@ var House3D;
             Stack.prototype.undo = function () {
                 if (this.index > 0) {
                     this.list[--this.index].undo();
+                    console.log(this.list);
                 }
                 else {
+                    console.warn('撤销到底了！');
                 }
             };
             Stack.prototype.redo = function () {
                 if (this.index < this.list.length) {
                     this.list[this.index++].redo();
+                    console.log(this.list);
                 }
                 else {
+                    console.warn('重做到顶了！');
                 }
             };
             return Stack;
@@ -4868,9 +4801,9 @@ var House3D;
             };
             RockerControls.prototype.init = function (container) {
                 var canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+                canvas.setAttribute("id", "rocker");
                 canvas.setAttribute("width", this._width.toString());
                 canvas.setAttribute("height", this._height.toString());
-                canvas.setAttribute("id", "rocker");
                 canvas.setAttribute("style", "position:absolute; top:100px; bottom:10px;");
                 this._domElement = canvas;
                 container.appendChild(canvas);
@@ -4881,14 +4814,14 @@ var House3D;
                 imgbg.setAttribute("height", this._height.toString());
                 imgbg.setAttribute("id", "imgbg");
                 imgbg.setAttribute("style", "display:none;");
-                imgbg.setAttribute("src", "/static/images/actionbar.jpg");
+                imgbg.setAttribute("src", "./images/1.png");
                 container.appendChild(imgbg);
                 var imgrk = document.createElement('img');
                 imgrk.setAttribute("width", (this._rockerRadius * 2).toString());
                 imgrk.setAttribute("height", (this._rockerRadius * 2).toString());
                 imgrk.setAttribute("id", "imgrk");
                 imgrk.setAttribute("style", "display:none;");
-                imgrk.setAttribute("src", "/static/images/3.png");
+                imgrk.setAttribute("src", "./images/2.png");
                 container.appendChild(imgrk);
                 this._rockerPosition.set(this._width / 2, this._height / 2);
             };
@@ -4901,7 +4834,7 @@ var House3D;
                 };
             };
             RockerControls.prototype.show = function () {
-                this._domElement.setAttribute("style", "display:block;position:absolute; right:30px; bottom:30px;");
+                this._domElement.setAttribute("style", "display:block;position:absolute; right:10px; bottom:10px;");
             };
             RockerControls.prototype.hide = function () {
                 this._domElement.setAttribute("style", "display:none;");
@@ -5627,7 +5560,7 @@ var House3D;
                 this._domElement.appendChild(this._scaleMenu);
                 var imgScale = document.createElement('img');
                 imgScale.id = "imgitem_sacle";
-                imgScale.src = "/static/images/sacleheight.png";
+                imgScale.src = "./images/sacleheight.png";
                 imgScale.width = 48;
                 imgScale.setAttribute("style", "float:left;");
                 this._scaleMenu.appendChild(imgScale);
@@ -5777,7 +5710,6 @@ var House3D;
                 this._offset.set(0, 0);
                 this._selected = undefined;
                 this.calcMouse(event);
-                this._house.setMouseDownPos(event.clientX, event.clientY);
                 var objects = this._house.getPickupMeshes();
                 var intersects = this._transform.intersectObjects(this._mouse, objects);
                 if (intersects.length > 0) {
@@ -5919,9 +5851,9 @@ var House3D;
                     return _this;
                 }
                 Background.prototype.init = function () {
-                    var skyGeo = new THREE.SphereBufferGeometry(5000, 32, 15);
+                    var skyGeo = new THREE.SphereBufferGeometry(1500, 32, 15);
                     var textureLoader = new THREE.TextureLoader();
-                    var mapBg = textureLoader.load('/static/images/5.jpg');
+                    var mapBg = textureLoader.load('models/2.jpg');
                     mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
                     mapBg.needsUpdate = true;
                     var materialBg = new THREE.MeshBasicMaterial({ map: mapBg });
@@ -6002,12 +5934,12 @@ var House3D;
                 this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
                 this._renderer.setPixelRatio(pixelRatio);
                 this._renderer.setSize(width, height);
-                this._renderer.setClearColor(0xf2f2ee);
+                this._renderer.setClearColor(0x000000, 0.0);
             };
             DesignEditor.prototype.initScene = function () {
                 this._scene = new THREE.Scene();
             };
-            DesignEditor.prototype.getMoveControl = function () {
+            DesignEditor.prototype.getMoveControls = function () {
                 return this._moveControls;
             };
             DesignEditor.prototype.intiControls = function (container) {
@@ -6133,6 +6065,7 @@ var House3D;
                 this.changeCamera(this._orthographicCamera);
                 this._houseScene.hiddenBackground();
                 this.resize(this._width, this._height);
+                this.pickupLock(false);
             };
             DesignEditor.prototype.overView = function () {
                 this._viewState = this.ViewState.OVERVIEW;
@@ -6144,6 +6077,7 @@ var House3D;
                 this.changeCamera(this._perspectiveCamera);
                 this._houseScene.hiddenBackground();
                 this.resize(this._width, this._height);
+                this.pickupLock(false);
             };
             DesignEditor.prototype.saveImage = function (filename) {
                 var canvas = this._renderer.domElement;
@@ -6154,11 +6088,6 @@ var House3D;
                 var event = document.createEvent('MouseEvents');
                 event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
                 save_link.dispatchEvent(event);
-            };
-            DesignEditor.prototype.printscreen = function (element) {
-                var canvas = this._renderer.domElement;
-                var imageData = canvas.toDataURL('image/png');
-                return imageData;
             };
             DesignEditor.prototype.shadowEnable = function () {
                 this._renderer.shadowMap.enabled = true;
@@ -6207,42 +6136,6 @@ var House3D;
             };
             DesignEditor.prototype.scaleMode = function () {
                 this._transformControls.setMode("scale");
-            };
-            DesignEditor.prototype.showMeshLables = function (value) {
-                var items = this._house.getAllItems();
-                for (var i = 0; i < items.length; i++) {
-                    items[i].showLabelMesh(value);
-                }
-            };
-            DesignEditor.prototype.getInViewObjects = function () {
-                var camera = this._camera;
-                camera.updateMatrix();
-                camera.updateMatrixWorld();
-                camera.matrixWorldInverse.getInverse(camera.matrixWorld);
-                var frustum = new THREE.Frustum();
-                frustum.setFromMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
-                var items = this._house.getAllItems();
-                var objects = [];
-                for (var i = 0; i < items.length; i++) {
-                    if (items[i].type == 'ItemGroup') {
-                        items[i].children.forEach(function (tmp) {
-                            objects.push(tmp);
-                        });
-                    }
-                    else {
-                        objects.push(items[i]);
-                    }
-                }
-                var count = 0;
-                for (var i = 0; i < objects.length; i++) {
-                    var object = objects[i];
-                    object.updateMatrix();
-                    object.updateMatrixWorld();
-                    var box = object.getBox();
-                    if (frustum.intersectsBox(box)) {
-                        console.log(count++);
-                    }
-                }
             };
             return DesignEditor;
         }());

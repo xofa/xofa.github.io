@@ -23,10 +23,17 @@ $(document).ready(function() {
   var load = new loadControl(engine);
   load.newDesign();
 
+  // engine.setPixelsPerCm(0.7);
+  engine.handle.updatePixelsPerCm();
   engine.draw();
 
-  $('.modal-body').on("click", "a", function(){
+
+  $('#roomSetting a').click( function(){
     engine.setRoomName($(this).text());
+  });
+
+  $('#roomSettingClose').click(function(){
+    $('#roomSetting').css('display','none');
   });
         
 
@@ -39,7 +46,7 @@ $(document).ready(function() {
     // imapic3d.init();
     // imapic3d.loadFrom2D(str);
 
-    linkTo3d(str);
+    linkTo3d(str,engine);
   });
 
 
@@ -133,10 +140,9 @@ var ModelScence = function () {
 }
 
 
-function linkTo3d(str) {
+function linkTo3d(str,engine2d) {
 
-  console.log(str);
-  
+  // console.log(str);
 
   var editor = new House3D.SceneEditor.DesignEditor();
   var container = document.getElementById('container');
@@ -144,7 +150,7 @@ function linkTo3d(str) {
   var scene = editor.getHouseScene();
   editor.run();
 
-  // editor.topView();
+  // editor.inHomeView();
   // scene.setHouseType("20", HouseModels);
   //init 
   var storey = new House3D.Houses.Storey();
@@ -153,8 +159,22 @@ function linkTo3d(str) {
   storey.addRoom(room);
   scene.getHouse().addStorey(storey);
 
-  var arr=[];
 
+  // var  texture = new THREE.TextureLoader().load('images/1.png',function(){
+  //    var material = new THREE.SpriteMaterial( { map: texture } );
+  //   var shopItem = new THREE.Sprite( material );
+  //   // shopItem.center.set( 0.0, 0.0 );
+  //   shopItem.scale.set( texture.image.width, texture.image.height, 1 );
+  //   scene.add( shopItem );
+  // }); //
+ 
+
+
+  var generator = new IMAPIC3D.RoomGenerator(undefined,true);
+
+
+
+  var arr=[];
   function addModel(mesh, type) {
     for(var i = 0; i < arr.length; i++){
       if(arr[i] == mesh.uuid)
@@ -177,13 +197,15 @@ function linkTo3d(str) {
     room.addObject(obj);
 
     arr.push(mesh.uuid);
+
   }
 
   //parse
   var data = JSON.parse(str);
   if(data == null || !('walls' in data) ) {return;}
 
-  var generator = new IMAPIC3D.RoomGenerator();
+  // var tex = generator.loadTexture('texture/1.jpg');
+  // generator.setGroundTexture(tex,4);
   var loader = new House3D.SceneEditor.Loaders.ModelLoader();
 
   var inWallsJson = data['inWalls'];
@@ -191,32 +213,41 @@ function linkTo3d(str) {
     loadItem(loader,item['uuid'],item['matrix'],addModel);
   });
 
-  var wallGroup = new THREE.Group();
   data['walls'].forEach((wall)=>{
     var _inWallsArray = [];
     for (var i = inWallsJson.length - 1; i >= 0; i--) {
       if(inWallsJson[i]['wallId'] == wall.id){ _inWallsArray.push(inWallsJson[i]); }
     }
-    generator.generateWall(wallGroup,wall,_inWallsArray,addModel);
+    generator.generateWall(undefined,wall,_inWallsArray,addModel);
   });
-  // scene.addModel(wallGroup);
-  // addModel(wallGroup, 'Wall');
-  // addModel(wallGroup, 'HangWall');
 
-
-  var roomGroup = new THREE.Group();
+  var centerArray = [];
   if(!('rooms' in data) ) {return;}
   data['rooms'].forEach((room)=>{
-    var _room = generator.generateRoom(room,addModel);
-    // addModel(_room,'Floor');
+    var center = generator.generateRoom(room,addModel);
+    centerArray.push(new THREE.Vector2(center.x,center.y));
   });
-  // scene.addModel(roomGroup);
-  // addModel(roomGroup, 'Wall');
+
+  var totalCenter = new THREE.Vector2();
+  for (var i = 0; i < centerArray.length ; i++) {
+    totalCenter.add(centerArray[i]);
+  }
+  totalCenter.divideScalar(centerArray.length);
+
+  var control = editor._overViewControls;
+  control.target.set(totalCenter.x,140,totalCenter.y);
+  control.update();
+  // editor._scene.position.sub(center.x,0,center.y);
+
+
 
   window.addEventListener("resize", function () {
     editor.resize(window.innerWidth, window.innerHeight);
   });
   editor.resize(window.innerWidth, window.innerHeight);
+
+
+
 
 }
 
@@ -224,10 +255,10 @@ function loadItem(loader,id,matrix,callback){
   
   var token = 'A72HjL/ix79l9M1uqGH7SfXhdNtqM81XaRfaTAeXz/2X4p+qW68O1g==';
   // var url = "http://192.168.0.130:8088/api/item/getitemgeometry" ; //获取物件
-  var url = "http://101.132.176.37:8059/api/item/getitemgeometry" ; //获取物件
+  var url = "http://101.132.176.37:8054/api/item/getitemgeometry" ; //获取物件
 
   $.get(url, {UUID: id,Token:token}, function(data,status){
-        console.log(data);
+        // console.log(data);
     var res = data.Data;
 
     var itemJson = JSON.parse(res.ItemJson);
@@ -246,7 +277,7 @@ function loadItem(loader,id,matrix,callback){
     loader.createItem1(data,function(item){
       // console.log(item);
       var box = new THREE.Box3().setFromObject(item);
-      console.log(box);
+      // console.log(box);
       item.matrix.identity();
       item.applyMatrix(matrix);
       item.scale.set(0.1,0.1,0.1);
@@ -262,9 +293,11 @@ function loadControl(engine) {
 
   var floorplan = engine.floorplan;
   this.newDesign = function() {
-    // var data = '{"floorplan":{"corners":{"56d9ebd1-91b2-875c-799d-54b3785fca1f":{"x":630.555,"y":-227.58400000000006},"8f4a050d-e102-3c3f-5af9-3d9133555d76":{"x":294.64,"y":-227.58400000000006},"4e312eca-6c4f-30d1-3d9a-a19a9d1ee359":{"x":294.64,"y":232.664},"254656bf-8a53-3987-c810-66b349f49b19":{"x":745.7439999999998,"y":232.664},"11d25193-4411-fbbf-78cb-ae7c0283164b":{"x":1044.7019999999998,"y":232.664},"edf0de13-df9f-cd6a-7d11-9bd13c36ce12":{"x":1044.7019999999998,"y":-105.66399999999999},"e7db8654-efe1-bda2-099a-70585874d8c0":{"x":745.7439999999998,"y":-105.66399999999999}},"walls":[{"corner1":"4e312eca-6c4f-30d1-3d9a-a19a9d1ee359","corner2":"254656bf-8a53-3987-c810-66b349f49b19","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/wallmap_yellow.png","stretch":true,"scale":null}},{"corner1":"254656bf-8a53-3987-c810-66b349f49b19","corner2":"e7db8654-efe1-bda2-099a-70585874d8c0","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/wallmap_yellow.png","stretch":true,"scale":null}},{"corner1":"56d9ebd1-91b2-875c-799d-54b3785fca1f","corner2":"8f4a050d-e102-3c3f-5af9-3d9133555d76","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/wallmap_yellow.png","stretch":true,"scale":null}},{"corner1":"8f4a050d-e102-3c3f-5af9-3d9133555d76","corner2":"4e312eca-6c4f-30d1-3d9a-a19a9d1ee359","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/wallmap_yellow.png","stretch":true,"scale":null}},{"corner1":"254656bf-8a53-3987-c810-66b349f49b19","corner2":"11d25193-4411-fbbf-78cb-ae7c0283164b","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0}},{"corner1":"11d25193-4411-fbbf-78cb-ae7c0283164b","corner2":"edf0de13-df9f-cd6a-7d11-9bd13c36ce12","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/light_brick.jpg","stretch":false,"scale":100}},{"corner1":"edf0de13-df9f-cd6a-7d11-9bd13c36ce12","corner2":"e7db8654-efe1-bda2-099a-70585874d8c0","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0}},{"corner1":"e7db8654-efe1-bda2-099a-70585874d8c0","corner2":"56d9ebd1-91b2-875c-799d-54b3785fca1f","frontTexture":{"url":"rooms/textures/wallmap.png","stretch":true,"scale":0},"backTexture":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/wallmap_yellow.png","stretch":true,"scale":null}}],"wallTextures":[],"floorTextures":{},"newFloorTextures":{"11d25193-4411-fbbf-78cb-ae7c0283164b,254656bf-8a53-3987-c810-66b349f49b19,e7db8654-efe1-bda2-099a-70585874d8c0,edf0de13-df9f-cd6a-7d11-9bd13c36ce12":{"url":"https://blueprint-dev.s3.amazonaws.com/uploads/floor_wall_texture/file/light_fine_wood.jpg","scale":300}}},"items":[{"item_name":"Full Bed","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/39/ik_nordli_full.js","xpos":939.5525544513545,"ypos":50,"zpos":-15.988409993966997,"rotation":-1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Bedside table - White","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/353/cb-archnight-white_baked.js","xpos":1001.0862865204286,"ypos":31.15939942141,"zpos":86.4297300551338,"rotation":-0.7872847644705953,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Open Door","item_type":7,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/174/open_door.js","xpos":745.2440185546875,"ypos":110.5,"zpos":64.8291839065202,"rotation":-1.5707963267948966,"scale_x":1.7003089598352215,"scale_y":0.997292171703541,"scale_z":0.999415040540576,"fixed":false},{"item_name":"Window","item_type":3,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/165/whitewindow.js","xpos":886.8841174461031,"ypos":139.1510114697785,"zpos":-105.16400146484375,"rotation":0,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Dresser - White","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/478/we-narrow6white_baked.js","xpos":898.0548281668393,"ypos":35.611997646165,"zpos":201.10860458067486,"rotation":-3.141592653589793,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Window","item_type":3,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/165/whitewindow.js","xpos":534.9620937975317,"ypos":137.60931398864443,"zpos":-227.08399963378906,"rotation":0,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Window","item_type":3,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/165/whitewindow.js","xpos":295.1400146484375,"ypos":141.43383044055196,"zpos":123.2280598724867,"rotation":1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Media Console - White","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/400/cb-clapboard_baked.js","xpos":658.6568227980731,"ypos":67.88999754395999,"zpos":-141.50237235990153,"rotation":-0.8154064090423808,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Blue Rug","item_type":8,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/440/cb-blue-block-60x96.js","xpos":905.8690190229256,"ypos":0.250005,"zpos":44.59927303228528,"rotation":-1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"NYC Poster","item_type":2,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/77/nyc-poster2.js","xpos":1038.448276049687,"ypos":146.22618581237782,"zpos":148.65033715350484,"rotation":-1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Sofa - Grey","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/596/cb-rochelle-gray_baked.js","xpos":356.92671999154373,"ypos":42.54509923821,"zpos":-21.686174295784554,"rotation":1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Coffee Table - Wood","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/68/ik-stockholmcoffee-brown.js","xpos":468.479104587435,"ypos":24.01483158034958,"zpos":-23.468458996048412,"rotation":1.5707963267948966,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Floor Lamp","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/614/ore-3legged-white_baked.js","xpos":346.697102333121,"ypos":72.163997943445,"zpos":-175.19915302127583,"rotation":0,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Red Chair","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/723/ik-ekero-orange_baked.js","xpos":397.676038151142,"ypos":37.50235073007,"zpos":156.31701312594373,"rotation":2.4062972386507093,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Window","item_type":3,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/165/whitewindow.js","xpos":374.7738207971076,"ypos":138.62749831597068,"zpos":-227.08399963378906,"rotation":0,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Closed Door","item_type":7,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/617/closed-door28x80_baked.js","xpos":637.2176377788675,"ypos":110.80000022010701,"zpos":232.16400146484375,"rotation":3.141592653589793,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false},{"item_name":"Bookshelf","item_type":1,"model_url":"https://blueprint-dev.s3.amazonaws.com/uploads/item_model/model/388/cb-kendallbookcasewalnut_baked.js","xpos":533.1460416453955,"ypos":92.17650034119151,"zpos":207.7644213268835,"rotation":3.141592653589793,"scale_x":1,"scale_y":1,"scale_z":1,"fixed":false}]}'
-    // var data = '{"floorplan":{"corners":[{"x":190.24799999676077,"y":-481.58400000192637},{"x":850.2479999967608,"y":518.4159999980735},{"x":652.3641294556497,"y":-146.06345528057977},{"x":190.24799999676077,"y":-146.06345528057972},{"x":850.2479999967608,"y":121.92000000048769},{"x":-809.7520000032391,"y":-481.58400000192637},{"x":-809.7520000032391,"y":518.4159999980735},{"x":190.24799999676077,"y":518.4159999980735}],"walls":[{"thickness":24,"cornerIndex":[3,7],"inWalls":[]},{"thickness":24,"cornerIndex":[0,5],"inWalls":[]},{"thickness":24,"cornerIndex":[1,7],"inWalls":[]},{"thickness":24,"cornerIndex":[1,4],"inWalls":[]},{"thickness":24,"cornerIndex":[2,4],"inWalls":[]},{"thickness":24,"cornerIndex":[0,3],"inWalls":[]},{"thickness":24,"cornerIndex":[2,3],"inWalls":[]},{"thickness":24,"cornerIndex":[5,6],"inWalls":[]},{"thickness":24,"cornerIndex":[6,7],"inWalls":[]}],"rooms":[{"name":"客厅","cornerIndex":[0,3,5,6,7]},{"name":"主卧","cornerIndex":[1,2,3,4,7]}]}}';
-    // floorplan.loadSerialized('{"floorplan":{"corners":[{"x":640.6116282846873,"y":-495.7210517740312},{"x":640.6116282846873,"y":-224.00783929537812},{"x":1248.565735747316,"y":-224.00783929537812},{"x":1248.565735747316,"y":481.3530948861111},{"x":640.6116282846873,"y":479.2789482259687},{"x":638.5796282846792,"y":149.55825314448697},{"x":143.15826620995915,"y":147.48410648434455},{"x":145.19026620996726,"y":477.2048015658263},{"x":640.6116282846873,"y":-16.593173281139116},{"x":1248.565735747316,"y":-16.593173281139116},{"x":-47.701558208033475,"y":477.81137963003385},{"x":-514.3883717153127,"y":-495.7210517740312},{"x":-514.3883717153127,"y":479.2789482259687},{"x":-514.3883717153127,"y":136.89367956939776},{"x":-120.3883717153127,"y":136.89367956939776},{"x":-120.3876529334733,"y":478.03995225495663},{"x":-514.3883717153127,"y":-149.3385595302521},{"x":-325.3883717153127,"y":-149.3385595302521},{"x":-325.3883717153127,"y":136.89367956939776}],"walls":[{"thickness":24,"cornerIndex":[12,15],"inWalls":[{"start":{"x":-354.67803023665005,"y":478.7767144477339},"offset":229.9111311524624,"type":11}]},{"thickness":24,"cornerIndex":[4,5],"inWalls":[]},{"thickness":24,"cornerIndex":[0,11],"inWalls":[]},{"thickness":24,"cornerIndex":[0,1],"inWalls":[]},{"thickness":24,"cornerIndex":[1,2],"inWalls":[{"start":{"x":885.3600000039015,"y":-224.00783929537812},"offset":334.7483717192142,"type":10}]},{"thickness":24,"cornerIndex":[2,9],"inWalls":[]},{"thickness":24,"cornerIndex":[3,4],"inWalls":[]},{"thickness":24,"cornerIndex":[1,8],"inWalls":[{"start":{"x":640.6116282846873,"y":-199.5385595302521},"offset":74.66927976512602,"type":0}]},{"thickness":24,"cornerIndex":[5,6],"inWalls":[]},{"thickness":24,"cornerIndex":[4,7],"inWalls":[{"start":{"x":480.1389178120696,"y":478.60710812792183},"offset":250.47411683990018,"type":10}]},{"thickness":24,"cornerIndex":[6,7],"inWalls":[{"start":{"x":143.60550318818008,"y":220.05462189997218},"offset":122.77189351673647,"type":0}]},{"thickness":24,"cornerIndex":[5,8],"inWalls":[{"start":{"x":639.0742665367583,"y":109.11295238302513},"offset":90.6483253137324,"type":0}]},{"thickness":24,"cornerIndex":[3,9],"inWalls":[]},{"thickness":24,"cornerIndex":[8,9],"inWalls":[]},{"thickness":24,"cornerIndex":[7,10],"inWalls":[]},{"thickness":24,"cornerIndex":[11,16],"inWalls":[{"start":{"x":-514.3883717153127,"y":-413.92800000145496},"offset":131.99305177257622,"type":0}]},{"thickness":24,"cornerIndex":[12,13],"inWalls":[]},{"thickness":24,"cornerIndex":[13,18],"inWalls":[]},{"thickness":24,"cornerIndex":[10,15],"inWalls":[]},{"thickness":24,"cornerIndex":[14,15],"inWalls":[]},{"thickness":24,"cornerIndex":[13,16],"inWalls":[]},{"thickness":24,"cornerIndex":[16,17],"inWalls":[]},{"thickness":24,"cornerIndex":[14,18],"inWalls":[{"start":{"x":-185.51200000094286,"y":136.89367956939776},"offset":115.32362828563018,"type":0}]},{"thickness":24,"cornerIndex":[17,18],"inWalls":[{"start":{"x":-325.3883717153127,"y":-66.79317328113915},"offset":132.74538624911295,"type":0}]}],"rooms":[{"name":"客厅","cornerIndex":[0,1,8,5,6,7,10,15,14,18,17,16,11]},{"name":"厨房","cornerIndex":[1,2,9,8]},{"name":"餐厅","cornerIndex":[3,4,5,8,9]},{"name":"主卧","cornerIndex":[4,7,6,5]},{"name":"次卧","cornerIndex":[12,13,18,14,15]},{"name":"卫生间","cornerIndex":[13,16,17,18]}]}}');
+
+    var data = '{"floorplan":{"corners":[{"id":"5bfbaf14-80f1-39da-dcc8-e741d6dd09c9","x":-406.272541949217,"y":594.0196016917242},{"id":"2240b9d9-4208-77e8-9996-b208790b1270","x":762.7274580507831,"y":594.0196016917242},{"id":"bd5d4811-e779-26aa-2fb5-827f114dfb08","x":762.7274580507831,"y":-474.98039830827577},{"id":"05dc1caf-dd2e-af51-3b42-84991ec21bf7","x":-406.272541949217,"y":-474.98039830827577},{"id":"2f0709c5-c3b8-d183-8710-d9f7a6632f85","x":-89.61894307703312,"y":-474.98039830827577},{"id":"93c7c819-b727-4516-173c-0f435f3d66d7","x":-89.61894307703312,"y":-18.980398308275767},{"id":"c44ad175-091f-808a-e8b6-b2837968ccc8","x":-406.272541949217,"y":-18.980398308275767},{"id":"5bf9fd15-7826-0096-27d2-a902d82d01ba","x":-209.11086717974405,"y":-18.980398308275767},{"id":"9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f","x":-406.272541949217,"y":276.0196016917242},{"id":"36883d2b-75c4-edad-64f6-dd81928ca39f","x":-209.11086717974405,"y":276.0196016917242},{"id":"158b032c-b50e-e97a-8ac4-75dc71e20850","x":232.88913282025607,"y":594.0196016917242},{"id":"96137e1d-cc0e-2875-0ca5-bb266c7b00e9","x":232.8891328202559,"y":276.0196016917242},{"id":"34b78b6f-9460-71c4-4314-568aac778229","x":232.8891328202559,"y":160.01960169172418},{"id":"c200ec67-4b92-1a3a-2415-9ef14d354d19","x":762.7274580507831,"y":160.01960169172418},{"id":"c0893a91-ef23-fbfd-8f38-fcc8b49c299f","x":523.7729339835494,"y":-474.98039830827577},{"id":"ba1876a6-ec4d-1361-a57b-bcb8ea509511","x":523.7729339835494,"y":160.01960169172418}],"walls":[{"id":"d92ec250-d50c-e047-343b-b9327277a213","thickness":24,"cornerIndex":["05dc1caf-dd2e-af51-3b42-84991ec21bf7","c44ad175-091f-808a-e8b6-b2837968ccc8"]},{"id":"80ff6f07-44d0-6ddf-515c-b59a742cf58e","thickness":24,"cornerIndex":["5bfbaf14-80f1-39da-dcc8-e741d6dd09c9","158b032c-b50e-e97a-8ac4-75dc71e20850"]},{"id":"f09e3613-cd0d-f3b8-3646-6d66a3fe3871","thickness":24,"cornerIndex":["2240b9d9-4208-77e8-9996-b208790b1270","c200ec67-4b92-1a3a-2415-9ef14d354d19"]},{"id":"36e0e0ff-6ab5-4076-f5a3-268746d204ad","thickness":24,"cornerIndex":["bd5d4811-e779-26aa-2fb5-827f114dfb08","c0893a91-ef23-fbfd-8f38-fcc8b49c299f"]},{"id":"c779a011-e261-9c1c-e653-0d9f9d0e191b","thickness":24,"cornerIndex":["2f0709c5-c3b8-d183-8710-d9f7a6632f85","05dc1caf-dd2e-af51-3b42-84991ec21bf7"]},{"id":"64ac22eb-07f6-cd91-1bd4-f35e52ba1e26","thickness":24,"cornerIndex":["2f0709c5-c3b8-d183-8710-d9f7a6632f85","93c7c819-b727-4516-173c-0f435f3d66d7"]},{"id":"53c68364-77cf-f00d-149c-5770fff02dc2","thickness":24,"cornerIndex":["c44ad175-091f-808a-e8b6-b2837968ccc8","9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f"]},{"id":"590e69c6-8dd8-f043-3c07-a58c08b00477","thickness":24,"cornerIndex":["93c7c819-b727-4516-173c-0f435f3d66d7","5bf9fd15-7826-0096-27d2-a902d82d01ba"]},{"id":"0b441091-7799-776d-228d-6bd3300686b5","thickness":24,"cornerIndex":["5bf9fd15-7826-0096-27d2-a902d82d01ba","c44ad175-091f-808a-e8b6-b2837968ccc8"]},{"id":"0d2f591c-fc27-f0be-0f1c-2bdd5b257dea","thickness":24,"cornerIndex":["5bf9fd15-7826-0096-27d2-a902d82d01ba","36883d2b-75c4-edad-64f6-dd81928ca39f"]},{"id":"6fea52e2-4ec1-5b50-4194-ddb81375b118","thickness":24,"cornerIndex":["9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f","5bfbaf14-80f1-39da-dcc8-e741d6dd09c9"]},{"id":"940ce1d9-d3e7-3756-ff74-05dcb2fb41d6","thickness":24,"cornerIndex":["36883d2b-75c4-edad-64f6-dd81928ca39f","9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f"]},{"id":"4dc43b43-3605-ff2b-d6a6-9dc61801594c","thickness":24,"cornerIndex":["36883d2b-75c4-edad-64f6-dd81928ca39f","96137e1d-cc0e-2875-0ca5-bb266c7b00e9"]},{"id":"7761ccf9-cf21-fa29-2c3a-ff36b7462ad0","thickness":24,"cornerIndex":["158b032c-b50e-e97a-8ac4-75dc71e20850","2240b9d9-4208-77e8-9996-b208790b1270"]},{"id":"dd96a4f9-4880-9a0b-ad52-0dffa06d1de0","thickness":24,"cornerIndex":["96137e1d-cc0e-2875-0ca5-bb266c7b00e9","158b032c-b50e-e97a-8ac4-75dc71e20850"]},{"id":"4767a0fb-a100-2891-d633-ffb086933df3","thickness":24,"cornerIndex":["96137e1d-cc0e-2875-0ca5-bb266c7b00e9","34b78b6f-9460-71c4-4314-568aac778229"]},{"id":"6e7f6032-817e-dd80-459b-878306568d71","thickness":24,"cornerIndex":["c200ec67-4b92-1a3a-2415-9ef14d354d19","bd5d4811-e779-26aa-2fb5-827f114dfb08"]},{"id":"d191e1ca-c377-4a6d-40f8-6231aab90bdc","thickness":24,"cornerIndex":["34b78b6f-9460-71c4-4314-568aac778229","ba1876a6-ec4d-1361-a57b-bcb8ea509511"]},{"id":"e0eb7dfb-1da5-e0e4-4be7-26f4a0702d87","thickness":24,"cornerIndex":["c0893a91-ef23-fbfd-8f38-fcc8b49c299f","2f0709c5-c3b8-d183-8710-d9f7a6632f85"]},{"id":"b3554d0f-b9a0-3a41-a92d-f0f9de11747c","thickness":24,"cornerIndex":["ba1876a6-ec4d-1361-a57b-bcb8ea509511","c200ec67-4b92-1a3a-2415-9ef14d354d19"]},{"id":"b51df2ae-f886-15f4-7f35-78395cbc68b3","thickness":24,"cornerIndex":["c0893a91-ef23-fbfd-8f38-fcc8b49c299f","ba1876a6-ec4d-1361-a57b-bcb8ea509511"]}],"inWalls":[{"id":"fec92043-2c32-6957-ef00-fa2154c8c4f2","wallId":"64ac22eb-07f6-cd91-1bd4-f35e52ba1e26","modelId":0,"offset":230.12439830729633,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"d1c27bd2-c567-af5b-5686-f778a722a201","wallId":"0d2f591c-fc27-f0be-0f1c-2bdd5b257dea","modelId":0,"offset":135.48502430841884,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"a7929a0e-81b0-21fb-cdcd-f9584364cb54","wallId":"4dc43b43-3605-ff2b-d6a6-9dc61801594c","modelId":0,"offset":227.39886717981724,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"d0b8b08f-946f-f509-6bad-360a4120784e","wallId":"d191e1ca-c377-4a6d-40f8-6231aab90bdc","modelId":0,"offset":147.49349224004044,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"e44e3c10-f3fc-ed67-0058-e516eca6cc65","wallId":"b51df2ae-f886-15f4-7f35-78395cbc68b3","modelId":0,"offset":305.30839830759703,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"243154cf-0b8b-4eaa-1d5c-bfa6fd97e69a","wallId":"80ff6f07-44d0-6ddf-515c-b59a742cf58e","modelId":0,"offset":316.65359887218386,"length":180,"bottom":50,"height":195,"type":10},{"id":"fa45735c-1774-053b-fd79-7c7b4908d236","wallId":"7761ccf9-cf21-fa29-2c3a-ff36b7462ad0","modelId":0,"offset":290.8838011632933,"length":180,"bottom":50,"height":195,"type":10},{"id":"61ade699-5b01-fe66-3898-e463602c5aef","wallId":"6e7f6032-817e-dd80-459b-878306568d71","modelId":0,"offset":317.4996016923541,"length":180,"bottom":50,"height":195,"type":10},{"id":"f8e3bf59-335d-9aed-8e66-b65c8e1b744c","wallId":"53c68364-77cf-f00d-149c-5770fff02dc2","modelId":0,"offset":137.4765563767974,"length":229.2,"bottom":50,"height":207.3,"type":11},{"id":"e2e182c2-094e-2ff7-5027-3a952b029caa","wallId":"6fea52e2-4ec1-5b50-4194-ddb81375b118","modelId":0,"offset":157.1386231806028,"length":180,"bottom":50,"height":195,"type":10},{"id":"e02c63a7-f3b2-3999-4e4b-15a7a07d1510","wallId":"f09e3613-cd0d-f3b8-3646-6d66a3fe3871","modelId":0,"offset":225.21160169024898,"length":180,"bottom":50,"height":195,"type":10},{"id":"6646c7a7-7727-7d8f-7faf-292053ec6a09","wallId":"e0eb7dfb-1da5-e0e4-4be7-26f4a0702d87","modelId":0,"offset":290.88380116329347,"length":100.4,"bottom":0,"height":210.2,"type":0},{"id":"1bba91dc-1519-cefe-6aea-114f353661d7","wallId":"d92ec250-d50c-e047-343b-b9327277a213","modelId":0,"offset":201.67639830718252,"length":180,"bottom":50,"height":195,"type":10}],"rooms":[{"id":"a5d68408-7219-697d-4b75-71e7a058df51","name":"次卧","cornerIndex":["5bfbaf14-80f1-39da-dcc8-e741d6dd09c9","9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f","36883d2b-75c4-edad-64f6-dd81928ca39f","96137e1d-cc0e-2875-0ca5-bb266c7b00e9","158b032c-b50e-e97a-8ac4-75dc71e20850"]},{"id":"7bfe9dc5-0136-0407-71b3-837844b46243","name":"主卧","cornerIndex":["2240b9d9-4208-77e8-9996-b208790b1270","158b032c-b50e-e97a-8ac4-75dc71e20850","96137e1d-cc0e-2875-0ca5-bb266c7b00e9","34b78b6f-9460-71c4-4314-568aac778229","ba1876a6-ec4d-1361-a57b-bcb8ea509511","c200ec67-4b92-1a3a-2415-9ef14d354d19"]},{"id":"586801ee-a724-b83f-be90-a84afae48e13","name":"餐厅","cornerIndex":["bd5d4811-e779-26aa-2fb5-827f114dfb08","c200ec67-4b92-1a3a-2415-9ef14d354d19","ba1876a6-ec4d-1361-a57b-bcb8ea509511","c0893a91-ef23-fbfd-8f38-fcc8b49c299f"]},{"id":"ddc794e5-1777-f15d-1d38-fcb0d270d766","name":"厨房","cornerIndex":["05dc1caf-dd2e-af51-3b42-84991ec21bf7","2f0709c5-c3b8-d183-8710-d9f7a6632f85","93c7c819-b727-4516-173c-0f435f3d66d7","5bf9fd15-7826-0096-27d2-a902d82d01ba","c44ad175-091f-808a-e8b6-b2837968ccc8"]},{"id":"d618ca42-b418-ed13-bc22-be97c45d1922","name":"门厅","cornerIndex":["2f0709c5-c3b8-d183-8710-d9f7a6632f85","c0893a91-ef23-fbfd-8f38-fcc8b49c299f","ba1876a6-ec4d-1361-a57b-bcb8ea509511","34b78b6f-9460-71c4-4314-568aac778229","96137e1d-cc0e-2875-0ca5-bb266c7b00e9","36883d2b-75c4-edad-64f6-dd81928ca39f","5bf9fd15-7826-0096-27d2-a902d82d01ba","93c7c819-b727-4516-173c-0f435f3d66d7"]},{"id":"3a65acae-a7e7-1f13-4ef5-369513713fab","name":"卫生间","cornerIndex":["c44ad175-091f-808a-e8b6-b2837968ccc8","5bf9fd15-7826-0096-27d2-a902d82d01ba","36883d2b-75c4-edad-64f6-dd81928ca39f","9aded034-0a9e-b1ec-cfe0-49d7f5c0df7f"]}]}}';
+
+    floorplan.loadSerialized(data);
+    engine.draw();
   };
 
   $("#newFile").click(this.newDesign);
@@ -279,6 +312,8 @@ function loadControl(engine) {
       floorplan.loadSerialized(data);
     }
     reader.readAsText(files[0]);
+
+    engine.draw();
   });
 
 
@@ -354,6 +389,7 @@ function viewer(engine) {
   this.init = function () {
 
     $( window ).resize( scope.handleWindowResize );
+    // document.addEventListener('resize',scope.handleWindowResize());
     scope.handleWindowResize();
 
     // mode buttons
