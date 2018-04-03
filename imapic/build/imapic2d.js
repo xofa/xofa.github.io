@@ -46,10 +46,6 @@ var IMAPIC2D;
             ADD_WINDOW1: 5.2,
             ADD_WINDOW2: 5.3
         },
-        CONFIG: {
-            cmPerFoot: 30.48,
-            pixelsPerFoot: 15.0
-        },
         COLOR: {
             DELETE: "#ff0000"
         },
@@ -62,7 +58,7 @@ var IMAPIC2D;
             COLOR: "#333333"
         },
         CORNER: {
-            RADIUS: 4,
+            RADIUS: 0,
             RADIUS_HOVER: 6,
             COLOR: "#ff0000",
             COLOR_HOVER: "#008cba"
@@ -140,7 +136,7 @@ var IMAPIC2D;
             DISTANCE_HOVER: 20.0
         },
         HELP_LINE: {
-            LENGTH: 50,
+            LENGTH: 70,
             WIDTH: 0.5,
             COLOR: "#bbbbbb"
         },
@@ -861,6 +857,40 @@ var IMAPIC2D;
             InWall.prototype.distanceFromPoint = function (point) {
                 return this.getLine().distanceToPoint(point);
             };
+            InWall.prototype.hovered = function (point, tolerence) {
+                tolerence = tolerence | 0;
+                if (this.type == 0) {
+                    return this.hovered_Door_dankai(point);
+                }
+                else if (this.type == 1) {
+                    return this.hovered_Door_shuangkai(point);
+                }
+                else {
+                    return this.distanceFromPoint(point) < tolerence;
+                }
+            };
+            InWall.prototype.hovered_Door_dankai = function (point) {
+                return this.hoveredSemiCircle(this.start, this.end, point, Math.PI / 2.0);
+            };
+            InWall.prototype.hoveredSemiCircle = function (start, end, point, angle) {
+                var p = end.clone().rotateAround(start, angle);
+                var vec1 = end.clone().sub(start);
+                var vec2 = p.clone().sub(start);
+                var vec0 = point.clone().sub(start);
+                var inCircle = point.distanceTo(start) < vec1.length();
+                var inSemi = vec0.dot(vec1) > 0 && vec0.dot(vec2) > 0;
+                if (inCircle && inSemi) {
+                    return true;
+                }
+                return false;
+            };
+            InWall.prototype.hovered_Door_shuangkai = function (point) {
+                var center = this.end.clone().add(this.start).divideScalar(2.0);
+                if (!this.hoveredSemiCircle(this.start, center, point, Math.PI / 2.0)) {
+                    return this.hoveredSemiCircle(this.end, center, point, -Math.PI / 2.0);
+                }
+                return true;
+            };
             InWall.prototype.relativeMove = function (dx, dy) {
                 this.compute(new IMAPIC2D.Vec2(dx, dy));
             };
@@ -1154,6 +1184,9 @@ var IMAPIC2D;
             Wall.prototype.distanceFromPoint = function (point) {
                 return this.getLine().distanceToPoint(point);
             };
+            Wall.prototype.hovered = function (point, tolerence) {
+                return this.distanceFromPoint(point) < tolerence;
+            };
             Wall.prototype.getStartXY = function (isStart) {
                 return isStart === false ? new IMAPIC2D.Vec2(this.end.x, this.end.y) : new IMAPIC2D.Vec2(this.start.x, this.start.y);
             };
@@ -1289,7 +1322,7 @@ var IMAPIC2D;
             };
             Floorplan.prototype.hoverOnItem = function (pos, items) {
                 for (var i = 0; i < items.length; i++) {
-                    if (items[i].distanceFromPoint(pos) < IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER) {
+                    if (items[i].hovered(pos, IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER)) {
                         return items[i];
                     }
                 }
@@ -1710,6 +1743,9 @@ var IMAPIC2D;
             Corner.prototype.distanceFromPoint = function (point) {
                 return this.getPosition().distanceTo(point);
             };
+            Corner.prototype.hovered = function (point, tolerence) {
+                return this.distanceFromPoint(point) < tolerence;
+            };
             Corner.prototype.remove = function () {
                 this.callbacks['delete'].fire(this);
             };
@@ -1794,17 +1830,17 @@ var IMAPIC2D;
             Corner.prototype.removeAll = function () {
                 this.remove();
             };
-            Corner.prototype.mergeWithIntersected = function () {
+            Corner.prototype.mergeWithIntersected = function (tolerance) {
                 for (var i = 0, corners = this.floorplan.getCorners(); i < corners.length; i++) {
                     var corner = corners[i];
-                    if (this !== corner && this.distanceFromPoint(corner.getPosition()) < IMAPIC2D._DEFINES_.TOLERANCE.CORNER) {
+                    if (this !== corner && this.distanceFromPoint(corner.getPosition()) < tolerance) {
                         this.combineWithCorner(corner);
                         return true;
                     }
                 }
                 for (var i = 0, walls = this.floorplan.getWalls(); i < walls.length; i++) {
                     var wall = walls[i];
-                    if (!this.isWallConnected(wall) && wall.distanceFromPoint(this.getPosition()) < IMAPIC2D._DEFINES_.TOLERANCE.CORNER) {
+                    if (!this.isWallConnected(wall) && wall.distanceFromPoint(this.getPosition()) < tolerance) {
                         var intersection = wall.getLine().closestPointOnLine(this.getPosition());
                         this.x = intersection.x;
                         this.y = intersection.y;
@@ -2010,11 +2046,11 @@ var IMAPIC2D;
                 this.mouseMoved = false;
                 this.needUpdate = false;
                 this.pixelsPerCm = 0.2;
-                this.scalePre = 1.0;
                 this.convertToClient2 = function (x, y) {
                     var pos = new IMAPIC2D.Vec2(x, y);
                     return pos.multiplyScalar(this.pixelsPerCm).sub(this.origin).add2(this.canvasJQ.offset().left, this.canvasJQ.offset().top);
                 };
+                this.scalePre = 1.0;
                 this.canvasJQ = $("#" + engine.canvasId);
                 this.canvasDOM = engine.canvasElement;
                 this.wallSettingJQ = $("#" + engine.wallSettingId);
@@ -2102,6 +2138,12 @@ var IMAPIC2D;
                     return;
                 }
                 this.handleMouseDown(event.clientX, event.clientY);
+            };
+            Handle.prototype.convertToClient = function (pos) {
+                return pos.multiplyScalar(this.pixelsPerCm).sub(this.origin).add2(this.canvasJQ.offset().left, this.canvasJQ.offset().top);
+            };
+            Handle.prototype.convertFromClient = function (pos) {
+                return new IMAPIC2D.Vec2(pos.x - this.canvasJQ.offset().left, pos.y - this.canvasJQ.offset().top).add(this.origin).divideScalar(this.pixelsPerCm);
             };
             Handle.prototype.updateRoom = function () {
                 this.floorplan.update();
@@ -2351,7 +2393,7 @@ var IMAPIC2D;
             };
             Handle.prototype.event_create_corner = function () {
                 var corner = this.floorplan.newCorner(this.target.x, this.target.y);
-                var needUpdateRoom = corner.mergeWithIntersected();
+                var needUpdateRoom = corner.mergeWithIntersected(IMAPIC2D._DEFINES_.TOLERANCE.CORNER);
                 if (this.lastCorner !== null && this.lastCorner.distanceTo(corner) > IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER) {
                     this.floorplan.newWall(this.lastCorner, corner);
                 }
@@ -2386,12 +2428,10 @@ var IMAPIC2D;
                 }
                 this.posMouseDown.set(x, y);
                 this.lastMouse.copy(this.rawMouse);
-                var needUpdateRoom = false;
                 if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DELETE) {
-                    needUpdateRoom = this.event_delete();
-                }
-                if (needUpdateRoom) {
-                    this.updateRoom();
+                    if (this.event_delete()) {
+                        this.updateRoom();
+                    }
                 }
             };
             Handle.prototype.handleMouseUp = function (x, y) {
@@ -2419,12 +2459,6 @@ var IMAPIC2D;
                         this.event_create_corner();
                     }
                 }
-            };
-            Handle.prototype.convertToClient = function (pos) {
-                return pos.multiplyScalar(this.pixelsPerCm).sub(this.origin).add2(this.canvasJQ.offset().left, this.canvasJQ.offset().top);
-            };
-            Handle.prototype.convertFromClient = function (pos) {
-                return new IMAPIC2D.Vec2(pos.x - this.canvasJQ.offset().left, pos.y - this.canvasJQ.offset().top).add(this.origin).divideScalar(this.pixelsPerCm);
             };
             Handle.prototype.computeRawCurMouse = function (x, y) {
                 this.rawMouse.set(x, y);
@@ -2454,7 +2488,13 @@ var IMAPIC2D;
                 this.posMouseDown.set(x, y);
                 this.computeRawCurMouse(x, y);
                 this.updateTarget();
-                if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DRAW) {
+                if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DELETE) {
+                    this.event_getActive();
+                    if (this.event_delete()) {
+                        this.updateRoom();
+                    }
+                }
+                else if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DRAW) {
                 }
                 else {
                     this.event_getActive();
@@ -2473,15 +2513,15 @@ var IMAPIC2D;
                 var corners = this.floorplan.getCorners();
                 for (var i = 0; i < corners.length; i++) {
                     var item = corners[i];
+                    var disX = Math.abs(curPos.x - item.x);
                     var disY = Math.abs(curPos.y - item.y);
-                    if (Math.abs(curPos.x - item.x) < IMAPIC2D._DEFINES_.TOLERANCE.MOUSE_SNAP && disY < dis.y) {
+                    if (disX < IMAPIC2D._DEFINES_.TOLERANCE.MOUSE_SNAP && disY < dis.y) {
                         curPos.x = item.x;
                         this.alignCorners.snap1 = item;
                         dis.y = disY;
                         snapped.x = true;
                     }
-                    var disX = Math.abs(curPos.x - item.x);
-                    if (Math.abs(curPos.y - item.y) < IMAPIC2D._DEFINES_.TOLERANCE.MOUSE_SNAP && disX < dis.x) {
+                    if (disY < IMAPIC2D._DEFINES_.TOLERANCE.MOUSE_SNAP && disX < dis.x) {
                         curPos.y = item.y;
                         this.alignCorners.snap2 = item;
                         dis.x = disX;
@@ -2666,28 +2706,6 @@ var IMAPIC2D;
                 var p2 = p0.clone().rotateAround(center, angle - Math.PI);
                 return [p1, p2];
             };
-            Draw.prototype.drawCurve2 = function (startX, startY, endX, endY, width, color, slope) {
-                this.context.beginPath();
-                this.context.moveTo(startX, startY);
-                this.context.arc(startX, startY, 50, slope, Math.PI / 2 + slope, false);
-                this.context.lineTo(startX, startY);
-                this.context.strokeStyle = color;
-                this.context.lineWidth = width;
-                this.context.stroke();
-                this.context.closePath();
-            };
-            Draw.prototype.drawCurve3 = function (startX, startY, endX, endY, width, color, slope) {
-                this.context.beginPath();
-                this.context.moveTo(startX, startY);
-                this.context.arc(startX, startY, 25, slope, Math.PI / 2 + slope, false);
-                this.context.lineTo(startX, startY);
-                this.context.moveTo(endX, endY);
-                this.context.arc(endX, endY, 25, slope - 1.5 * Math.PI, Math.PI / 2 + slope - 1.5 * Math.PI, false);
-                this.context.strokeStyle = color;
-                this.context.lineWidth = width;
-                this.context.stroke();
-                this.context.closePath();
-            };
             Draw.prototype.drawCamera = function (image, camera, relative, angle, rotate) {
                 this.context.save();
                 this.context.translate(relative.x, relative.y);
@@ -2718,6 +2736,8 @@ var IMAPIC2D;
         function Engine(options) {
             var _this = this;
             this.enableChange = true;
+            this.showWallLabels = true;
+            this.showCenter = false;
             this.canvasId = options.canvasId;
             this.wallSettingId = options.wallSettingDivId;
             this.roomSettingId = options.roomSettingDivId;
@@ -2760,7 +2780,9 @@ var IMAPIC2D;
             this.floorplan.getRooms().forEach(function (room) {
                 _this.drawRoom(room);
             });
-            this.drawCenter(this.handle.origin);
+            if (this.showCenter) {
+                this.drawCenter(this.handle.origin);
+            }
             this.drawWalls(this.floorplan.getWalls());
             if (IMAPIC2D._DEFINES_.CAMERA.VISIBLE) {
                 this.drawCamera(this.floorplan.getCamera());
@@ -2847,22 +2869,6 @@ var IMAPIC2D;
             this.context.fillStyle = style;
             this.context.fill();
         };
-        Engine.prototype.drawPixelCurve3 = function (start, end, width, color, slope) {
-            var _start = this.handle.convert(start);
-            var _end = this.handle.convert(end);
-            var halfPI = Math.PI / 2.0;
-            this.context.beginPath();
-            this.context.moveTo(_start.x, _start.y);
-            this.context.arc(_start.x, _start.y, 25, slope, halfPI + slope, false);
-            this.context.lineTo(_start.x, _start.y);
-            this.context.moveTo(_end.x, _end.y);
-            this.context.arc(_end.x, _end.y, 25, slope + halfPI, slope + Math.PI, false);
-            this.context.lineTo(_end.x, _end.y);
-            this.context.closePath();
-            this.context.strokeStyle = color;
-            this.context.lineWidth = width;
-            this.context.stroke();
-        };
         Engine.prototype.drawCenter = function (origin) {
             var len = IMAPIC2D._DEFINES_.GRID.SPACING / 6;
             var x = -origin.x;
@@ -2925,7 +2931,7 @@ var IMAPIC2D;
                 this.drawBasic.drawLines([new IMAPIC2D.Line(lastPos, targetPos)], target_item.WIDTH, target_item.COLOR);
                 var lineArrays = [];
                 var fontLines = [];
-                this.getHelpLineAndLabel(new IMAPIC2D.Line(lastNode, target), lineArrays, fontLines);
+                this.getHelpLineAndLabel(new IMAPIC2D.Line(lastNode, target), lineArrays, fontLines, IMAPIC2D._DEFINES_.WALL.THICKNESS);
                 this.drawPixelLines(lineArrays, IMAPIC2D._DEFINES_.HELP_LINE.WIDTH, IMAPIC2D._DEFINES_.HELP_LINE.COLOR);
                 this.drawWallLengthLabels(fontLines);
                 var corners = lastNode.adjacentCorners();
@@ -2978,29 +2984,31 @@ var IMAPIC2D;
             var hover = (item === this.handle.active.inWall) ? 1 : 0;
             var color = this.getColorByState(hover, IMAPIC2D._DEFINES_.IN_WALL);
             var type = item.getType();
-            if (0 == type) {
-                this.drawDoorDankai(item, color);
-            }
-            else if (1 == type) {
-                this.drawDoorShuangkai(item, color);
-            }
-            else if (2 == type) {
-                this.drawDoorTuiyi(item, color);
-            }
-            else if (10 == type) {
-                this.drawWindow(item, color);
-            }
-            else if (11 == type) {
-                this.drawWindowLuodi(item, color);
-            }
-            else if (12 == type) {
-                this.drawWindowPiao(item, color);
-            }
-            else {
-                console.error('不支持的绘制类型：' + type);
+            switch (type) {
+                case 0:
+                    this.drawDoorSingle(item, color);
+                    break;
+                case 1:
+                    this.drawDoorDouble(item, color);
+                    break;
+                case 2:
+                    this.drawDoorSliding(item, color);
+                    break;
+                case 10:
+                    this.drawWindowNormal(item, color);
+                    break;
+                case 11:
+                    this.drawWindowFrench(item, color);
+                    break;
+                case 12:
+                    this.drawWindowBay(item, color);
+                    break;
+                default:
+                    console.error('不支持的绘制类型：' + type);
+                    break;
             }
         };
-        Engine.prototype.drawDoorDankai = function (item, color) {
+        Engine.prototype.drawDoorSingle = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             var center = this.handle.convert(line.start);
@@ -3012,13 +3020,13 @@ var IMAPIC2D;
             this.context.arc(center.x, center.y, radius, slope, slope + Math.PI / 2.0, false);
             this.context.stroke();
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
-            var p = line.end.clone().rotateAround(line.start, Math.PI / 2.0);
             var disVec = line.scale(width * 0.7);
+            var p = line.end.clone().rotateAround(line.start, Math.PI / 2.0);
             var p1 = p.clone().add(disVec);
             var p2 = line.start.clone().add(disVec);
             this.drawPixelPolygonStrip([line.start, p, p1, p2], false, color, 1);
         };
-        Engine.prototype.drawDoorShuangkai = function (item, color) {
+        Engine.prototype.drawDoorDouble = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             var center1 = this.handle.convert(line.start);
@@ -3045,7 +3053,7 @@ var IMAPIC2D;
             p2 = line.end.clone().add(disVec);
             this.drawPixelPolygonStrip([line.end, p0, p1, p2], false, color, 1);
         };
-        Engine.prototype.drawDoorTuiyi = function (item, color) {
+        Engine.prototype.drawDoorSliding = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
@@ -3084,7 +3092,7 @@ var IMAPIC2D;
             lineArray.push(new IMAPIC2D.Line(e21, e20));
             this.drawPixelLines(lineArray, 1, color);
         };
-        Engine.prototype.drawWindow = function (item, color) {
+        Engine.prototype.drawWindowNormal = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
@@ -3095,7 +3103,7 @@ var IMAPIC2D;
             var line4 = new IMAPIC2D.Line(line1.end, line2.end);
             this.drawPixelLines([line, line1, line2, line3, line4], 1, color);
         };
-        Engine.prototype.drawWindowLuodi = function (item, color) {
+        Engine.prototype.drawWindowFrench = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
@@ -3114,7 +3122,7 @@ var IMAPIC2D;
             var line7 = new IMAPIC2D.Line(line5.center(), line6.center());
             this.drawPixelLines([line1, line2, line3, line4, line5, line6, line7], 1, color);
         };
-        Engine.prototype.drawWindowPiao = function (item, color) {
+        Engine.prototype.drawWindowBay = function (item, color) {
             var line = item.getLine();
             var width = item.wall.thickness;
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
@@ -3170,7 +3178,7 @@ var IMAPIC2D;
             var helpLineArrays = [];
             var fontLinesArrays = [];
             walls.forEach(function (wall) {
-                _this.getHelpLineAndLabel(wall.getLine(), helpLineArrays, fontLinesArrays);
+                _this.getHelpLineAndLabel(wall.getLine(), helpLineArrays, fontLinesArrays, wall.thickness);
             });
             this.drawPixelLines(helpLineArrays, IMAPIC2D._DEFINES_.HELP_LINE.WIDTH, IMAPIC2D._DEFINES_.HELP_LINE.COLOR);
             this.drawWallLengthLabels(fontLinesArrays);
@@ -3185,19 +3193,24 @@ var IMAPIC2D;
             this.context.lineWidth = 4;
             lineArr.forEach(function (line) {
                 var tmpPos = _this.handle.convert(line.center());
+                var slope = Math.asin((line.end.y - line.start.y) / line.length());
                 var str = "" + Math.round(line.length() * 10.0);
-                _this.context.strokeText(str, tmpPos.x, tmpPos.y);
-                _this.context.fillText(str, tmpPos.x, tmpPos.y);
+                _this.context.save();
+                _this.context.translate(tmpPos.x, tmpPos.y);
+                _this.context.rotate(slope);
+                _this.context.strokeText(str, 0, 0);
+                _this.context.fillText(str, 0, 0);
+                _this.context.restore();
             });
         };
-        Engine.prototype.getHelpLineAndLabel = function (line, ArrLine, ArrLabel) {
+        Engine.prototype.getHelpLineAndLabel = function (line, ArrLine, ArrLabel, wallThickness) {
             if (line.length() < 30) {
                 return;
             }
             var helpLength = IMAPIC2D._DEFINES_.HELP_LINE.LENGTH;
             var lineLEN = line.scale(helpLength / 2.0);
             var lineLEN2 = line.scale(helpLength / 4.0);
-            var lineOffset = line.scale(helpLength / 2.0 + IMAPIC2D._DEFINES_.WALL.THICKNESS * this.handle.pixelsPerCm / 2.0);
+            var lineOffset = line.scale(helpLength / 2.0 + wallThickness * this.handle.pixelsPerCm / 2.0);
             var _start = lineOffset.clone().add(line.start).rotateAround(line.start, Math.PI / 2);
             var _end = lineOffset.clone().add(line.end).rotateAround(line.end, Math.PI / 2);
             ArrLabel.push(new IMAPIC2D.Line(_start, _end));
