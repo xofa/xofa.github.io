@@ -1749,25 +1749,31 @@ var IMAPIC2D;
             Corner.prototype.remove = function () {
                 this.callbacks['delete'].fire(this);
             };
-            Corner.prototype.needMove = function (newPnt) {
-                var walls = this.adjacentWalls();
-                newPnt = newPnt || this.getPosition();
+            Corner.prototype.checkCornerCanmove = function (corner, newPnt) {
+                var walls = corner.adjacentWalls();
                 if (!walls || walls.length < 2) {
                     return true;
                 }
-                else {
-                    var _walls = this.sortWalls(walls);
-                    for (var i = 0, len = _walls.length; i < len; i++) {
-                        var wall0 = _walls[i];
-                        var wall1 = i + 1 == len ? _walls[0] : _walls[i + 1];
-                        var slope0 = new IMAPIC2D.Line(newPnt, wall0.oppositeCorner(this)).slope();
-                        var slope1 = new IMAPIC2D.Line(newPnt, wall1.oppositeCorner(this)).slope();
-                        if (Math.abs(slope0 - slope1) < Math.PI / 18.0) {
-                            return false;
-                        }
+                var _walls = corner.sortWalls(walls);
+                for (var i = 0, len = _walls.length; i < len; i++) {
+                    var wall0 = _walls[i];
+                    var wall1 = i + 1 == len ? _walls[0] : _walls[i + 1];
+                    var slope0 = new IMAPIC2D.Line(newPnt, wall0.oppositeCorner(corner)).slope();
+                    var slope1 = new IMAPIC2D.Line(newPnt, wall1.oppositeCorner(corner)).slope();
+                    if (Math.abs(slope0 - slope1) < Math.PI / 18.0) {
+                        return false;
                     }
-                    return true;
                 }
+                return true;
+            };
+            Corner.prototype.needMove = function (newPnt) {
+                newPnt = newPnt || this.getPosition();
+                if (this.checkCornerCanmove(this, newPnt)) {
+                }
+                else {
+                    return false;
+                }
+                return true;
             };
             Corner.prototype.move = function (newX, newY) {
                 if (!this.needMove(new IMAPIC2D.Vec2(newX, newY))) {
@@ -2162,14 +2168,17 @@ var IMAPIC2D;
             Handle.prototype.setMouseCursor = function () {
                 var mouseCursorStr = 'default';
                 if (this.noAcitve()) {
-                    mouseCursorStr = mouseCursorStr;
+                    mouseCursorStr = 'default';
                 }
                 else {
-                    if (this.active.corner !== null || this.active.inWall !== null || this.active.camera !== null || this.active.sector !== null) {
-                        mouseCursorStr = 'move';
+                    if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DELETE) {
+                        mouseCursorStr = 'Pointer';
                     }
                     else if (this.active.wall !== null) {
                         mouseCursorStr = this.SetCursorStyleByWallDirection(this.active.wall);
+                    }
+                    else {
+                        mouseCursorStr = 'move';
                     }
                 }
                 this.canvasJQ.css('cursor', mouseCursorStr);
@@ -2492,6 +2501,7 @@ var IMAPIC2D;
                     this.event_getActive();
                     if (this.event_delete()) {
                         this.updateRoom();
+                        this.setMode(IMAPIC2D._DEFINES_.EVENTS.MOVE);
                     }
                 }
                 else if (this.mode == IMAPIC2D._DEFINES_.EVENTS.DRAW) {
@@ -3193,7 +3203,8 @@ var IMAPIC2D;
             this.context.lineWidth = 4;
             lineArr.forEach(function (line) {
                 var tmpPos = _this.handle.convert(line.center());
-                var slope = Math.asin((line.end.y - line.start.y) / line.length());
+                var slope = line.slope();
+                slope = line.end.x < line.start.x ? slope + Math.PI : slope;
                 var str = "" + Math.round(line.length() * 10.0);
                 _this.context.save();
                 _this.context.translate(tmpPos.x, tmpPos.y);
