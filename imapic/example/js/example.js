@@ -15,6 +15,7 @@ $(document).ready(function() {
     roomImgId: "roomBkg",
     wallSettingDivId: 'wallSetting',
     roomSettingDivId: 'roomSetting',
+    wallLengthSettingDivId:'wallLengthSetting',
 
   };
   var engine = new IMAPIC2D.Engine(opts);
@@ -28,7 +29,9 @@ $(document).ready(function() {
   engine.draw();
 
 
-
+  $('#wallLengthSetting').on('focus',function(){
+    setTimeout(function () { $('#wallLengthSetting').select(); }, 50);
+  });
 
 
   $('#roomSetting a').click( function(){
@@ -288,7 +291,7 @@ function loadItem(loader,id,matrix,callback){
       // console.log(box);
       item.matrix.identity();
       item.applyMatrix(matrix);
-      item.scale.set(0.1,0.1,0.1);
+      // item.scale.set(0.1,0.1,0.1);
       // group.addItem(item);//,
       callback(item,'InWallItem');
     });

@@ -61,7 +61,8 @@ var IMAPIC2D;
             RADIUS: 0,
             RADIUS_HOVER: 6,
             COLOR: "#ff0000",
-            COLOR_HOVER: "#008cba"
+            COLOR_HOVER: "#008cba",
+            COLOR_SELECT: "#00baba"
         },
         WALL: {
             COLOR: "#888888",
@@ -84,6 +85,7 @@ var IMAPIC2D;
         IN_WALL: {
             COLOR: "#888888",
             COLOR_HOVER: "#008cba",
+            COLOR_SELECT: "#00baba",
             ITEMS: {
                 0: {
                     name: '单开门',
@@ -125,7 +127,7 @@ var IMAPIC2D;
                     WIDTH: 181.8,
                     _HEIGHT: 214,
                     _BOTTOM: 0,
-                    UUID: '7208EE0B-F318-4D96-A8E4-69502D9EE6E3'
+                    UUID: '500E52A3-C014-4608-A0A2-71D12B8787EC'
                 }
             }
         },
@@ -760,6 +762,7 @@ var IMAPIC2D;
                 };
                 this.start = new IMAPIC2D.Vec2();
                 this.end = new IMAPIC2D.Vec2();
+                this.lengthScaled = 1.0;
                 this.id = IMAPIC2D.Core.Utils.guid();
                 this.initSize(type);
                 this.computeStart();
@@ -774,6 +777,7 @@ var IMAPIC2D;
                     modelId: 0,
                     offset: this.offset,
                     length: this.length,
+                    lengthScaled: this.lengthScaled,
                     bottom: this.disToBot,
                     height: this.height,
                     type: this.type
@@ -782,11 +786,11 @@ var IMAPIC2D;
             InWall.prototype.getMatrix = function () {
                 var item = IMAPIC2D._DEFINES_.IN_WALL.ITEMS[this.type];
                 var line = this.getLine();
-                var matrix0 = new THREE.Matrix4().makeTranslation(this.length / 2.0, 0, 0);
-                var matrix1 = new THREE.Matrix4().makeRotationY(Math.PI * 2.0 - line.slope());
+                var matrixS = new THREE.Matrix4().makeScale(this.lengthScaled * 0.1, 0.1, 0.1);
+                var matrix0 = new THREE.Matrix4().makeTranslation(this.length * this.lengthScaled / 2.0, 0, 0);
+                var matrixR = new THREE.Matrix4().makeRotationY(Math.PI * 2.0 - line.slope());
                 var matrix2 = new THREE.Matrix4().makeTranslation(line.start.x, this.disToBot, line.start.y);
-                var _mat = matrix2.multiply(matrix1).multiply(matrix0);
-                return _mat;
+                return matrix2.multiply(matrixR).multiply(matrix0).multiply(matrixS);
             };
             InWall.prototype.to3d = function () {
                 var item = IMAPIC2D._DEFINES_.IN_WALL.ITEMS[this.type];
@@ -796,7 +800,7 @@ var IMAPIC2D;
                     wallId: this.wall.id,
                     start: this.start.toJson(),
                     end: this.end.toJson(),
-                    length: this.length,
+                    length: this.length * this.lengthScaled,
                     offsetStart_1: _offsetStart + this.wall.offset.offset_1,
                     offsetStart_2: _offsetStart + this.wall.offset.offset_2,
                     bottom: this.disToBot,
@@ -836,14 +840,15 @@ var IMAPIC2D;
             InWall.prototype.computeStart = function () {
                 var line = this.wall.restrictLine;
                 this.start.copy(line.start);
-                this.end = line.scale(this.length).add(this.start);
+                this.end = line.scale(this.length * this.lengthScaled).add(this.start);
             };
             InWall.prototype.compute = function (centerXY) {
                 var line = this.wall.getLine();
                 var p = line.closestPointOnLine(centerXY);
-                var MinDistance = this.length / 2.0;
+                var len = this.length * this.lengthScaled;
+                var MinDistance = len / 2.0;
                 if ((p.distanceTo(this.wall.restrictLine.start) >= MinDistance) && (p.distanceTo(this.wall.restrictLine.end) >= MinDistance)) {
-                    var scaleVec = line.scale(this.length / 2.0);
+                    var scaleVec = line.scale(len / 2.0);
                     this.start.subVectors(p, scaleVec);
                     this.end.addVectors(p, scaleVec);
                     this.offset = p.distanceTo(line.start);
@@ -851,14 +856,21 @@ var IMAPIC2D;
             };
             InWall.prototype.recompute = function () {
                 var line = this.wall.getLine();
-                this.start.addVectors(line.scale(this.offset - this.length / 2.0), line.start);
-                this.end.addVectors(line.scale(this.offset + this.length / 2.0), line.start);
+                var half_len = this.length * this.lengthScaled / 2.0;
+                this.start.addVectors(line.scale(this.offset - half_len), line.start);
+                this.end.addVectors(line.scale(this.offset + half_len), line.start);
+            };
+            InWall.prototype.computeOffsetAndLength = function () {
+                this.lengthScaled = this.start.distanceTo(this.end) / this.length;
+                this.offset = this.start.clone().add(this.end).multiplyScalar(0.5).distanceTo(this.wall.getStartXY());
             };
             InWall.prototype.distanceFromPoint = function (point) {
                 return this.getLine().distanceToPoint(point);
             };
             InWall.prototype.hovered = function (point, tolerence) {
                 tolerence = tolerence | 0;
+                if (this.distanceFromPoint(point) < tolerence)
+                    return true;
                 if (this.type == 0) {
                     return this.hovered_Door_dankai(point);
                 }
@@ -866,7 +878,7 @@ var IMAPIC2D;
                     return this.hovered_Door_shuangkai(point);
                 }
                 else {
-                    return this.distanceFromPoint(point) < tolerence;
+                    return false;
                 }
             };
             InWall.prototype.hovered_Door_dankai = function (point) {
@@ -2029,12 +2041,15 @@ var IMAPIC2D;
                     corner: null,
                     wall: null,
                     inWall: null,
+                    inWallPoint: undefined,
                     camera: null,
                     sector: null
                 };
                 this.selected = {
+                    corner: null,
                     room: null,
-                    wall: null
+                    wall: null,
+                    inWall: null,
                 };
                 this.origin = new IMAPIC2D.Vec2();
                 this.target = new IMAPIC2D.Vec2();
@@ -2066,6 +2081,7 @@ var IMAPIC2D;
                 this.canvasJQ.bind("mousemove", function (event) { scope.mousemove(event); });
                 this.canvasJQ.bind("mouseup", function (event) { scope.mouseup(event); });
                 this.canvasJQ.bind("mouseleave", function () { scope.mouseleave(); });
+                $(document).keyup(function (event) { scope.keyup(event); });
                 this.canvasDOM.addEventListener('touchstart', function (event) { scope.touchstart(event); }, false);
                 this.canvasDOM.addEventListener('touchend', function (event) { scope.touchend(event); }, false);
                 this.canvasDOM.addEventListener('touchmove', function (event) { scope.touchmove(event); }, false);
@@ -2074,12 +2090,37 @@ var IMAPIC2D;
                     this.floorplan.newCamera(this.target.x, this.target.y);
                 }
                 $(window).resize(function () { scope.handleWindowResize(); });
-                $(document).keyup(function (e) {
-                    if (e.keyCode == 27) {
-                        scope.escapeKey();
-                    }
-                });
             }
+            Handle.prototype.keyup = function (event) {
+                var key = event.keyCode;
+                if (key == 27) {
+                    this.escapeKey();
+                }
+                var input = $("#" + this.engine.wallLengthSettingId);
+                console.log(key);
+                if (input.css('display') == 'none' || this.mode !== IMAPIC2D._DEFINES_.EVENTS.DRAW || this.lastCorner == null) {
+                    return;
+                }
+                var lengthNum = (input.val() + "").replace(/[^0-9]/g, '');
+                input.val(lengthNum);
+                if (key == 13 || key == 16777296) {
+                    var len = parseInt(lengthNum) / 10.0;
+                    if (len < 100) {
+                        alert('墙长度不得低于10CM！');
+                    }
+                    else if (len > 10000) {
+                        alert('墙长度不得高于100M！');
+                    }
+                    else {
+                        var line = new IMAPIC2D.Line(this.lastCorner, this.target);
+                        var p = line.scale(len).add(this.lastCorner);
+                        this.target.copy(p);
+                        this.event_create_corner();
+                        input.hide();
+                    }
+                    return;
+                }
+            };
             Handle.prototype.escapeKey = function () {
                 this.setMode(IMAPIC2D._DEFINES_.EVENTS.MOVE);
             };
@@ -2117,12 +2158,13 @@ var IMAPIC2D;
             };
             Handle.prototype.setMode = function (mode) {
                 this.lastCorner = null;
+                $('#' + this.engine.wallLengthSettingId).hide();
                 this.mode = mode;
                 this.modeResetCallbacks.fire(mode);
                 this.updateTarget();
             };
             Handle.prototype.noAcitve = function () {
-                return this.active.corner == null && this.active.inWall == null && this.active.wall == null && this.active.camera == null && this.active.sector == null;
+                return this.active.inWallPoint == undefined && this.active.corner == null && this.active.inWall == null && this.active.wall == null && this.active.camera == null && this.active.sector == null;
             };
             Handle.prototype.mousewheel = function (event) {
                 event.preventDefault();
@@ -2141,6 +2183,7 @@ var IMAPIC2D;
                     }
                     this.mouseDown = false;
                     this.setMode(IMAPIC2D._DEFINES_.EVENTS.MOVE);
+                    $("#" + this.engine.wallLengthSettingId).hide();
                     return;
                 }
                 this.handleMouseDown(event.clientX, event.clientY);
@@ -2303,7 +2346,28 @@ var IMAPIC2D;
                 }
             };
             Handle.prototype.event_move = function () {
-                if (this.active.corner) {
+                if (this.selected.inWall && this.active.inWallPoint !== undefined) {
+                    var item = this.selected.inWall;
+                    var activePoint = this.active.inWallPoint;
+                    var line = item.wall.restrictLine;
+                    var p = line.closestPointOnLine(this.curMouse);
+                    var restrictStart = item.wall.restrictLine.start;
+                    var restrictEnd = item.wall.restrictLine.end;
+                    if (activePoint.equals(item.start)) {
+                        restrictEnd = item.end;
+                        item.start.copy(p);
+                    }
+                    else if (activePoint.equals(item.end)) {
+                        restrictStart = item.start;
+                        item.end.copy(p);
+                    }
+                    else {
+                        console.error('怎么可能！');
+                        return;
+                    }
+                    item.computeOffsetAndLength();
+                }
+                else if (this.active.corner) {
                     var activeCorner = this.active.corner;
                     if (activeCorner.move(this.curMouse.x, this.curMouse.y)) {
                         activeCorner.adjacentWalls().forEach(function (wall) {
@@ -2357,22 +2421,33 @@ var IMAPIC2D;
                         }
                     }
                     var needMove = true;
-                    var items = attachedWall.onItems;
-                    for (var i = 0; i < items.length; i++) {
-                        var inwall = items[i];
-                        if ((inwall != curInWall) && (inwall.getLine().center().distanceTo(this.curMouse) < (inwall.getLength() + curInWall.getLength()) / 2.0)) {
-                            needMove = false;
-                            break;
-                        }
-                    }
                     if (needMove) {
                         if (attachedWall !== curInWall.wall) {
                             curInWall.updateAttachedWall(attachedWall);
                         }
-                        this.active.inWall.relativeMove(this.curMouse.x, this.curMouse.y);
+                        curInWall.relativeMove(this.curMouse.x, this.curMouse.y);
                     }
                 }
                 else {
+                }
+            };
+            Handle.prototype.event_getSelected = function () {
+                this.selected.corner = this.getActiveItem(this.floorplan.getCorners(), this.selected.corner);
+                if (this.selected.corner == null) {
+                    this.selected.inWall = this.getActiveItem(this.floorplan.getInWall(), this.selected.inWall);
+                    if (this.selected.inWall == null) {
+                        this.selected.wall = this.getActiveItem(this.floorplan.getWalls(), this.selected.wall);
+                    }
+                    else {
+                        this.selected.wall = null;
+                    }
+                }
+                else {
+                    this.active.inWall = null;
+                    this.active.wall = null;
+                }
+                if (this.needUpdate) {
+                    this.update();
                 }
             };
             Handle.prototype.event_getActive = function () {
@@ -2381,17 +2456,37 @@ var IMAPIC2D;
                     this.active.sector = this.getSectorActiveItem(this.floorplan.getCamera(), this.active.sector);
                 }
                 else {
-                    this.active.corner = this.getActiveItem(this.floorplan.getCorners(), this.active.corner);
-                    if (this.active.corner == null) {
-                        this.active.inWall = this.getActiveItem(this.floorplan.getInWall(), this.active.inWall);
-                        if (this.active.inWall == null) {
-                            this.active.wall = this.getActiveItem(this.floorplan.getWalls(), this.active.wall);
+                    if (this.selected.inWall) {
+                        var item = this.selected.inWall;
+                        var distance = item.wall.thickness;
+                        if (item.start.distanceTo(this.curMouse) < distance) {
+                            this.active.inWallPoint = item.start;
+                        }
+                        else if (item.end.distanceTo(this.curMouse) < distance) {
+                            this.active.inWallPoint = item.end;
                         }
                         else {
+                            this.active.inWallPoint = undefined;
+                        }
+                    }
+                    if (this.active.inWallPoint === undefined) {
+                        this.active.corner = this.getActiveItem(this.floorplan.getCorners(), this.active.corner);
+                        if (this.active.corner == null) {
+                            this.active.inWall = this.getActiveItem(this.floorplan.getInWall(), this.active.inWall);
+                            if (this.active.inWall == null) {
+                                this.active.wall = this.getActiveItem(this.floorplan.getWalls(), this.active.wall);
+                            }
+                            else {
+                                this.active.wall = null;
+                            }
+                        }
+                        else {
+                            this.active.inWall = null;
                             this.active.wall = null;
                         }
                     }
                     else {
+                        this.active.corner = null;
                         this.active.inWall = null;
                         this.active.wall = null;
                     }
@@ -2405,6 +2500,7 @@ var IMAPIC2D;
                 var needUpdateRoom = corner.mergeWithIntersected(IMAPIC2D._DEFINES_.TOLERANCE.CORNER);
                 if (this.lastCorner !== null && this.lastCorner.distanceTo(corner) > IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER) {
                     this.floorplan.newWall(this.lastCorner, corner);
+                    $("#" + this.engine.wallLengthSettingId).hide();
                 }
                 this.lastCorner = corner;
                 if (needUpdateRoom) {
@@ -2412,28 +2508,55 @@ var IMAPIC2D;
                 }
                 this.update();
             };
+            Handle.prototype.handleSelected_room = function (x, y) {
+                this.roomSettingJQ.css('left', x + 40);
+                this.roomSettingJQ.css('top', y);
+                this.roomSettingJQ.css('display', 'block');
+            };
             Handle.prototype.event_select = function (x, y) {
-                var curPos = this.convertFromClient(new IMAPIC2D.Vec2(x, y));
-                this.selected.room = this.getSelectedRoom(curPos);
-                if (this.selected.room != null) {
-                    this.roomSettingJQ.css('left', x + 40);
-                    this.roomSettingJQ.css('top', y);
-                    this.roomSettingJQ.css('display', 'block');
+                this.selected.corner = this.getActiveItem(this.floorplan.getCorners(), this.selected.corner);
+                if (this.selected.corner != null) {
+                    this.selected.inWall = null;
+                    this.selected.wall = null;
+                    this.selected.room = null;
                 }
                 else {
-                    this.roomSettingJQ.css('display', 'none');
-                    var selectedWall = this.floorplan.hoverOnItem(this.curMouse, this.floorplan.getWalls());
-                    if (this.selected.wall != selectedWall) {
-                        this.selected.wall = selectedWall;
-                        this.update();
+                    this.selected.inWall = this.getActiveItem(this.floorplan.getInWall(), this.selected.inWall);
+                    if (this.selected.inWall != null) {
+                        this.selected.wall = null;
+                        this.selected.room = null;
                     }
+                    else {
+                        this.selected.wall = this.getActiveItem(this.floorplan.getWalls(), this.selected.wall);
+                        if (this.selected.wall != null) {
+                            this.selected.room = null;
+                        }
+                        else {
+                            var room = this.getSelectedRoom(this.curMouse);
+                            if (room != this.selected.room) {
+                                this.needUpdate = true;
+                                this.selected.room = room;
+                            }
+                            if (this.selected.room != null) {
+                                this.handleSelected_room(x, y);
+                            }
+                        }
+                    }
+                }
+                if (this.needUpdate) {
+                    this.update();
+                }
+                if (this.selected.room == null) {
+                    this.roomSettingJQ.css('display', 'none');
                 }
             };
             Handle.prototype.handleMouseDown = function (x, y) {
                 this.mouseDown = true;
                 this.mouseMoved = false;
-                for (var key in this.selected) {
-                    this.selected[key] = null;
+                if (!this.selected.inWall || this.active.inWallPoint === undefined) {
+                    for (var key in this.selected) {
+                        this.selected[key] = null;
+                    }
                 }
                 this.posMouseDown.set(x, y);
                 this.lastMouse.copy(this.rawMouse);
@@ -2442,6 +2565,7 @@ var IMAPIC2D;
                         this.updateRoom();
                     }
                 }
+                this.update();
             };
             Handle.prototype.handleMouseUp = function (x, y) {
                 this.mouseDown = false;
@@ -2751,6 +2875,7 @@ var IMAPIC2D;
             this.canvasId = options.canvasId;
             this.wallSettingId = options.wallSettingDivId;
             this.roomSettingId = options.roomSettingDivId;
+            this.wallLengthSettingId = options.wallLengthSettingDivId;
             this.canvasElement = document.getElementById(options.canvasId);
             this.context = this.canvasElement.getContext('2d');
             this.drawBasic = new IMAPIC2D.Core.Draw(this.context);
@@ -2924,8 +3049,8 @@ var IMAPIC2D;
         };
         Engine.prototype.drawTarget = function (target) {
             var targetPos = this.handle.convert(target);
-            var snap1 = this.handle.alignCorners.snap1;
             var align_item = IMAPIC2D._DEFINES_.ALIGN_LINE;
+            var snap1 = this.handle.alignCorners.snap1;
             if (snap1 !== null) {
                 this.drawBasic.drawDashLine(this.handle.convert(snap1), targetPos, align_item.WIDTH, align_item.COLOR);
             }
@@ -2936,16 +3061,16 @@ var IMAPIC2D;
             var target_item = IMAPIC2D._DEFINES_.TARGET;
             this.drawBasic.drawCircle(targetPos, target_item.RADIUS, target_item.COLOR, false, target_item.WIDTH);
             var lastNode = this.handle.lastCorner;
-            if (lastNode !== null) {
+            if (lastNode !== null && lastNode.distanceTo(target) > IMAPIC2D._DEFINES_.TOLERANCE.DISTANCE_HOVER) {
                 var lastPos = this.handle.convert(lastNode);
                 this.drawBasic.drawLines([new IMAPIC2D.Line(lastPos, targetPos)], target_item.WIDTH, target_item.COLOR);
                 var lineArrays = [];
                 var fontLines = [];
                 this.getHelpLineAndLabel(new IMAPIC2D.Line(lastNode, target), lineArrays, fontLines, IMAPIC2D._DEFINES_.WALL.THICKNESS);
                 this.drawPixelLines(lineArrays, IMAPIC2D._DEFINES_.HELP_LINE.WIDTH, IMAPIC2D._DEFINES_.HELP_LINE.COLOR);
-                this.drawWallLengthLabels(fontLines);
+                fontLines[0] && this.drawWallLengthLabels_Target(fontLines[0]);
                 var corners = lastNode.adjacentCorners();
-                var corner0;
+                var corner0 = null;
                 if (corners !== null && corners.length > 0) {
                     corner0 = corners[0];
                 }
@@ -2990,8 +3115,22 @@ var IMAPIC2D;
                 }
             });
         };
+        Engine.prototype.drawScaleCorner = function (item) {
+            var pStart = this.handle.convert(item.start);
+            var pEnd = this.handle.convert(item.end);
+            var radius = item.wall.thickness * this.handle.pixelsPerCm / 2.0;
+            var color = IMAPIC2D._DEFINES_.IN_WALL.COLOR_SELECT;
+            this.drawBasic.drawCircle(pStart, radius, color, true);
+            this.drawBasic.drawCircle(pEnd, radius, color, true);
+        };
         Engine.prototype.drawItem = function (item) {
-            var hover = (item === this.handle.active.inWall) ? 1 : 0;
+            var hover = 0;
+            if (item === this.handle.selected.inWall) {
+                hover = 2;
+            }
+            else if (item === this.handle.active.inWall) {
+                hover = 1;
+            }
             var color = this.getColorByState(hover, IMAPIC2D._DEFINES_.IN_WALL);
             var type = item.getType();
             switch (type) {
@@ -3016,6 +3155,9 @@ var IMAPIC2D;
                 default:
                     console.error('不支持的绘制类型：' + type);
                     break;
+            }
+            if (hover == 2) {
+                this.drawScaleCorner(item);
             }
         };
         Engine.prototype.drawDoorSingle = function (item, color) {
@@ -3136,20 +3278,15 @@ var IMAPIC2D;
             var line = item.getLine();
             var width = item.wall.thickness;
             this.drawPixelLines([line], width * this.handle.pixelsPerCm, '#ffffff');
-            var disVec = line.scale(width / 2.0);
-            var line1 = line.start.rotatedLine(disVec, Math.PI / 2.0);
-            var line2 = line.end.rotatedLine(disVec, Math.PI / 2.0);
-            var line3 = new IMAPIC2D.Line(line1.start, line2.start);
-            var line4 = new IMAPIC2D.Line(line1.end, line2.end);
-            var scaler = width * 0.33;
-            var p1 = line1.scale(scaler).add(line1.start);
-            var p2 = line2.scale(scaler).add(line2.start);
-            var p3 = line1.scale(scaler).negate().add(line1.end);
-            var p4 = line2.scale(scaler).negate().add(line2.end);
-            var line5 = new IMAPIC2D.Line(p1, p2);
-            var line6 = new IMAPIC2D.Line(p3, p4);
-            var line7 = new IMAPIC2D.Line(line5.center(), line6.center());
-            this.drawPixelLines([line1, line2, line3, line4, line5, line6, line7], 1, color);
+            var disVec = line.scale(100 / 2.0);
+            var p1 = disVec.clone().add(line.start);
+            p1.rotateAround(line.start, Math.PI / 2.0);
+            var p2 = disVec.clone().add(line.end);
+            p2.rotateAround(line.end, Math.PI / 2.0);
+            var line1 = new IMAPIC2D.Line(line.start, p1);
+            var line2 = new IMAPIC2D.Line(p1, p2);
+            var line3 = new IMAPIC2D.Line(p2, line.end);
+            this.drawPixelLines([line1, line2, line3], 1, color);
         };
         Engine.prototype.drawWalls = function (walls) {
             var _this = this;
@@ -3157,7 +3294,7 @@ var IMAPIC2D;
                 return;
             var state = IMAPIC2D._DEFINES_.WALL;
             var unHovered = IMAPIC2D.Core.Utils.removeIf(walls, function (wall) {
-                return wall === _this.handle.active.wall;
+                return wall === _this.handle.active.wall || wall === _this.handle.selected.wall;
             });
             var lines = [];
             var points = [];
@@ -3179,7 +3316,11 @@ var IMAPIC2D;
             }
             var selected = this.handle.selected.wall;
             var hovered = this.handle.active.wall;
-            if (hovered) {
+            var drawHover = false;
+            if (selected != null) {
+                drawPoly(selected, 2);
+            }
+            if (hovered != null && hovered != selected) {
                 drawPoly(hovered, 1);
             }
         };
@@ -3192,6 +3333,19 @@ var IMAPIC2D;
             });
             this.drawPixelLines(helpLineArrays, IMAPIC2D._DEFINES_.HELP_LINE.WIDTH, IMAPIC2D._DEFINES_.HELP_LINE.COLOR);
             this.drawWallLengthLabels(fontLinesArrays);
+        };
+        Engine.prototype.drawWallLengthLabels_Target = function (line) {
+            var p = line.center();
+            var tmpPos = this.handle.convert(p);
+            var str = "" + Math.round(line.length() * 10.0);
+            var input = $('#' + this.wallLengthSettingId);
+            if (input.css('display', 'none')) {
+                input.show();
+                input.focus();
+            }
+            input.css('left', tmpPos.x - 20);
+            input.css('top', tmpPos.y);
+            input.val(str);
         };
         Engine.prototype.drawWallLengthLabels = function (lineArr) {
             var _this = this;
