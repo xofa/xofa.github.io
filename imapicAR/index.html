@@ -170,7 +170,7 @@
 				  // var url = "http://192.168.0.130:8088/api/item/getitemgeometry" ; //获取物件
 				var url = "https://www.imapic.cn/itemapi/api/getitemgeometry" ; //获取物件
 
-				$.post(url, {UUID: id,Token:token}, function(data,status){
+				$.get(url, {UUID: id,Token:token}, function(data,status){
 
 				    var res = data.Data;
 
