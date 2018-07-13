@@ -71,7 +71,7 @@ $(document).ready(function() {
 
     var id = GetQueryString('id');
 
-    $.get("http://www.imapic.cn/miniapp/api/housetype/select?id="+id, function(data){
+    $.get("https://www.imapic.cn/miniapp/api/housetype/select?id="+id, function(data){
 
       if(data.Data == null || data.Code !== 200){
         alert('找不到这个户型');
