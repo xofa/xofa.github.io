@@ -124,6 +124,8 @@
 
         // setTimeout(function() {
 
+          controlsDevice.screenOrientation = window.orientation || 0;
+
           camera.aspect = window.innerWidth / window.innerHeight;
           camera.updateProjectionMatrix();
 
