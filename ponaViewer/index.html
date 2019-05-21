@@ -101,7 +101,7 @@
         // controlsDevice
         controlsDevice = new THREE.DeviceOrientationControls( camera );
         controlsDevice.enabled = false;
-        controlsDevice.disconnect();
+        // controlsDevice.disconnect();
                                                                 
       
         window.addEventListener( 'resize', onWindowResize, false );
@@ -114,21 +114,25 @@
 
         controlsDevice.enabled = !controlsDevice.enabled;
         controls.enabled = !controls.enabled;
-        if(controlsDevice.enabled){
-          controlsDevice.connect();
+        // if(controlsDevice.enabled){
+        //   controlsDevice.connect();
 
-        }else{
-          controlsDevice.disconnect();
-        }
+        // }else{
+        //   controlsDevice.disconnect();
+        // }
       }
 
       function onWindowResize() {
 
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
 
-        renderer.setSize( window.innerWidth, window.innerHeight );
+        setTimeout(function() {
 
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+
+          renderer.setSize( window.innerWidth, window.innerHeight );
+        },300);
+        
       }
 
 
