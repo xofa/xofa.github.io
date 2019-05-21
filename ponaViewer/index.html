@@ -102,7 +102,7 @@
         // controlsDevice
         controlsDevice = new THREE.DeviceOrientationControls( camera );
         controlsDevice.enabled = true;
-
+                                                                
       
 
       }
@@ -138,7 +138,7 @@
       function update() {
 
         controlsDevice.update(); 
-        controls.update(); 
+        controls.enabled&&controls.update(); 
         renderer.render( scene, camera );
 
       }
