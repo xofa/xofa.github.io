@@ -21,7 +21,7 @@
  
 
     <script src="three.min.js"></script>
-    <script src="DeviceOrientationControls.js"></script>
+    <!-- <script src="DeviceOrientationControls.js"></script> -->
 
     <script>
 
@@ -94,41 +94,41 @@
         // controlsDevice.enabled = false;
 
 
-        document.addEventListener( 'dragover', function ( event ) {
+        // document.addEventListener( 'dragover', function ( event ) {
 
-          event.preventDefault();
-          event.dataTransfer.dropEffect = 'copy';
+        //   event.preventDefault();
+        //   event.dataTransfer.dropEffect = 'copy';
 
-        }, false );
+        // }, false );
 
-        document.addEventListener( 'dragenter', function () {
+        // document.addEventListener( 'dragenter', function () {
 
-          document.body.style.opacity = 0.5;
+        //   document.body.style.opacity = 0.5;
 
-        }, false );
+        // }, false );
 
-        document.addEventListener( 'dragleave', function () {
+        // document.addEventListener( 'dragleave', function () {
 
-          document.body.style.opacity = 1;
+        //   document.body.style.opacity = 1;
 
-        }, false );
+        // }, false );
 
-        document.addEventListener( 'drop', function ( event ) {
+        // document.addEventListener( 'drop', function ( event ) {
 
-          event.preventDefault();
+        //   event.preventDefault();
 
-          var reader = new FileReader();
-          reader.addEventListener( 'load', function ( event ) {
+        //   var reader = new FileReader();
+        //   reader.addEventListener( 'load', function ( event ) {
 
-            material.map.image.src = event.target.result;
-            material.map.needsUpdate = true;
+        //     material.map.image.src = event.target.result;
+        //     material.map.needsUpdate = true;
 
-          }, false );
-          reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
+        //   }, false );
+        //   reader.readAsDataURL( event.dataTransfer.files[ 0 ] );
 
-          document.body.style.opacity = 1;
+        //   document.body.style.opacity = 1;
 
-        }, false );
+        // }, false );
 
         //
 
