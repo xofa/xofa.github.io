@@ -90,8 +90,8 @@
 // 　　});
 
         // controlsDevice
-        controlsDevice = new THREE.DeviceOrientationControls( camera );
-        controlsDevice.enabled = false;
+        // controlsDevice = new THREE.DeviceOrientationControls( camera );
+        // controlsDevice.enabled = false;
 
 
         document.addEventListener( 'dragover', function ( event ) {
@@ -222,7 +222,7 @@
         camera.position.copy( camera.target ).negate();
         */
 
-        controlsDevice.update();
+        // controlsDevice.update();
 
         renderer.render( scene, camera );
 
