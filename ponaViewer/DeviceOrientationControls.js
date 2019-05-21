@@ -27,10 +27,10 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	var onScreenOrientationChangeEvent = function () {
 
-		setTimeout(function() {
+		// setTimeout(function() {
 
 			scope.screenOrientation = window.orientation || 0;
-		},300);
+		// },300);
 
 		// this.object.aspect = window.innerWidth / window.innerHeight;
   //       this.object.updateProjectionMatrix();

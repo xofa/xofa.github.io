@@ -101,6 +101,7 @@
         // controlsDevice
         controlsDevice = new THREE.DeviceOrientationControls( camera );
         controlsDevice.enabled = false;
+        controlsDevice.disconnect();
                                                                 
       
         window.addEventListener( 'resize', onWindowResize, false );
@@ -113,6 +114,12 @@
 
         controlsDevice.enabled = !controlsDevice.enabled;
         controls.enabled = !controls.enabled;
+        if(controlsDevice.enabled){
+          controlsDevice.connect();
+
+        }else{
+          controlsDevice.disconnect();
+        }
       }
 
       function onWindowResize() {
