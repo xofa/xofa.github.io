@@ -113,20 +113,22 @@
 
         controlsDevice.enabled = !controlsDevice.enabled;
         controls.enabled = !controls.enabled;
+
+        
    
       }
 
       function onWindowResize() {
 
 
-        setTimeout(function() {
+        // setTimeout(function() {
 
           camera.aspect = window.innerWidth / window.innerHeight;
           camera.updateProjectionMatrix();
 
           renderer.setSize( window.innerWidth, window.innerHeight );
-        },300);
-        
+        // },300);
+
       }
 
 
