@@ -27,7 +27,10 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	var onScreenOrientationChangeEvent = function () {
 
-		scope.screenOrientation = window.orientation || 0;
+		setTimeout(function() {
+
+			scope.screenOrientation = window.orientation || 0;
+		},300);
 
 		// this.object.aspect = window.innerWidth / window.innerHeight;
   //       this.object.updateProjectionMatrix();
@@ -62,9 +65,9 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.connect = function () {
 
-		// onScreenOrientationChangeEvent(); // run once on load
+		onScreenOrientationChangeEvent(); // run once on load
 
-		// window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.addEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
 		window.addEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		scope.enabled = true;
@@ -73,7 +76,7 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	this.disconnect = function () {
 
-		// window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
+		window.removeEventListener( 'orientationchange', onScreenOrientationChangeEvent, false );
 		window.removeEventListener( 'deviceorientation', onDeviceOrientationChangeEvent, false );
 
 		scope.enabled = false;
