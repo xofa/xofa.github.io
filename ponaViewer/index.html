@@ -96,6 +96,7 @@
         controls.autoRotate = true;
         controls.autoRotateSpeed = 0.2;
         controls.enabled = true;
+        controls.enablePan = false;
 
 
         // controlsDevice
@@ -103,8 +104,8 @@
         controlsDevice.enabled = false;
                                                                 
       
-        window.addEventListener( 'resize', onWindowResize, false );
-
+        // window.addEventListener( 'resize', onWindowResize, false );
+        window.addEventListener( 'orientationchange', onWindowResize, false );
       }
 
       function switchVR(){
@@ -114,7 +115,7 @@
         controlsDevice.enabled = !controlsDevice.enabled;
         controls.enabled = !controls.enabled;
 
-        
+
    
       }
 
