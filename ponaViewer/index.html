@@ -104,7 +104,7 @@
         controlsDevice.enabled = false;
                                                                 
       
-        // window.addEventListener( 'resize', onWindowResize, false );
+        window.addEventListener( 'resize', onWindowResize, false );
         window.addEventListener( 'orientationchange', onWindowResize, false );
       }
 
@@ -122,7 +122,7 @@
       function onWindowResize() {
 
 
-          controlsDevice.screenOrientation = window.orientation || 0;
+        controlsDevice.enabled &&controlsDevice.deviceOrientation&&(controlsDevice.screenOrientation = window.orientation || 0);
         setTimeout(function() {
 
 
