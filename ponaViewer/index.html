@@ -80,7 +80,6 @@
         container.appendChild( renderer.domElement );
 
 
-        window.addEventListener( 'resize', onWindowResize, false );
         
 
 
@@ -95,15 +94,16 @@
         controls.target.set(0.1,0,0);
         controls.rotateSpeed = 0.8;
         controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.3;
-        controls.enabled = false;
+        controls.autoRotateSpeed = 0.2;
+        controls.enabled = true;
 
 
         // controlsDevice
         controlsDevice = new THREE.DeviceOrientationControls( camera );
-        controlsDevice.enabled = true;
+        controlsDevice.enabled = false;
                                                                 
       
+        window.addEventListener( 'resize', onWindowResize, false );
 
       }
 
@@ -112,7 +112,7 @@
         console.log("11111");
 
         controlsDevice.enabled = !controlsDevice.enabled;
-        controls.enabled = !controls.enabled;
+        // controls.enabled = !controls.enabled;
       }
 
       function onWindowResize() {
@@ -138,7 +138,7 @@
       function update() {
 
         controlsDevice.update(); 
-        controls.enabled&&controls.update(); 
+        /*controls.enabled&&*/controls.update(); 
         renderer.render( scene, camera );
 
       }
