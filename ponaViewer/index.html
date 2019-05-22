@@ -13,14 +13,17 @@
         background-color: #000;
       }
 
-      #vr{
+      button{
         position: absolute;
+        
+      }
+
+      #vr{
         right: 40px;
         top:40px;
       }
 
       #rotate{
-        position: absolute;
         right: 40px;
         top:100px;
       }
@@ -74,7 +77,7 @@
 
         if(viewer.getControlName() == "orbit"){
 
-          viewer.control.autoRotate = !viewer.control.autoRotate;
+          viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
         }
       }
 
