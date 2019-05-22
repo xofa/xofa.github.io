@@ -15,7 +15,7 @@
 
       button{
         position: absolute;
-        
+
       }
 
       #vr{
@@ -53,11 +53,17 @@
 
     <script>
 
-      var panorama, viewer;
+      window.onload = function () {
+        document.body.addEventListener('touchmove', function (e) {
+          e.preventDefault()
+          //阻止默认的处理方式(阻止下拉滑动的效果)
+        }, {passive: false})
+      }
 
-      panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
 
-      viewer = new PANOLENS.Viewer( { 
+      var panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
+
+      var viewer = new PANOLENS.Viewer( { 
 
         controlBar: false
 
