@@ -74,7 +74,10 @@
 
         var id = viewer.control.name == "orbit" ? 1 : 0;
 
-        viewer.control = viewer.controls[id];
+        // viewer.control = viewer.controls[id];
+
+        // PANOLENS.Controls.DEVICEORIENTATION;
+        viewer.enableControl(id);
       }
 
     </script>
