@@ -56,7 +56,8 @@
     
     <script src="js/three.js"></script>
     <!-- <script src="../build/panolens-offline.min.js"></script> -->
-    <script src="js/panolens-offline.min.js"></script>
+    <script src="../build/panolens-offline.js"></script>
+    <script src="js/pano.js"></script>
 
     <script>
 
@@ -67,109 +68,119 @@
       //   }, {passive: false})
       // }
 
-      var container = document.querySelector( '#container' );
+      // var container = document.querySelector( '#container' );
 
-      var viewer = new PANOLENS.Viewer( { 
+      // var viewer = new PANOLENS.Viewer( { 
 
-        container: container,
-        controlBar: true,
-        controlButtons: [],
-        autoHideInfospot: false,
-        output: 'console'
+      //   container: container,
+      //   controlBar: true,
+      //   controlButtons: [],
+      //   autoHideInfospot: false,
+      //   output: 'console'
   
 
-      } );
+      // } );
    
 
 
-      function addIconVR(){
+      // function addIconVR(){
 
-        var switchVR = {
-          style: {
-            backgroundImage: 'url(icon/device.png)',
-            float: 'right'
-          },
+      //   var switchVR = {
+      //     style: {
+      //       backgroundImage: 'url(icon/device.png)',
+      //       float: 'right'
+      //     },
           
-          onTap: function(){
-            viewer.toggleNextControl();
-          }
-        };
-        viewer.appendControlItem(switchVR);
-      }
+      //     onTap: function(){
+      //       viewer.toggleNextControl();
+      //     }
+      //   };
+      //   viewer.appendControlItem(switchVR);
+      // }
 
-      addIconVR();
+      // addIconVR();
       
-      function addIconRotate(){
-        var autoRotate = {
-          style: {
-            backgroundImage: 'url(icon/rotate.png)',
-            float: 'right'
-          },
+      // function addIconRotate(){
+      //   var autoRotate = {
+      //     style: {
+      //       backgroundImage: 'url(icon/rotate.png)',
+      //       float: 'right'
+      //     },
           
-          onTap: function(){
-            if(viewer.getControlName() == "orbit"){
+      //     onTap: function(){
+      //       if(viewer.getControlName() == "orbit"){
 
-              viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
-            }
-          }
-        };
-        viewer.appendControlItem(autoRotate);
-      }
-      addIconRotate();
-
-
+      //         viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
+      //       }
+      //     }
+      //   };
+      //   viewer.appendControlItem(autoRotate);
+      // }
+      // addIconRotate();
 
 
 
-
-      function addSpot(x,y,z,texture){
-
-
-        var infospot = new PANOLENS.Infospot( 350, texture,true);
-        infospot.position.set( x,y,z );
-
-        // infospot.show();
-        infospot.addEventListener( "click", function(){
-          this.focus();
-        } );
-
-        return infospot;
-
-      }
-
-      function addSpotList(items,texture,panorama){
+      // function addSpotList(items,texture,panorama){
 
 
-        for (var i = 0; i < items.length; i++) {
+      //   for (var i = 0; i < items.length; i++) {
 
-          var item = items[i];
+      //     var item = items[i];
 
-          var p = item.position;
-          var infospot = addSpot(p[0],p[1],p[2],texture);
-          // infospot.addStaticText(item.text);
-          infospot.addHoverText(item.text);
-          infospot.runAnimator = new PANOLENS.TextureAnimator( texture, 1, 25, 25, 35 );
-          panorama.add( infospot );
-        }
+      //     var p = item.position;
+      //     // var infospot = addSpot(p[0],p[1],p[2],texture);
 
-      }
+      //     var infospot = new PANOLENS.Infospot( 350, texture,true)
+      //     // infospot.addStaticText(item.text);
+      //     infospot.position.set( p[0],p[1],p[2] );
+      //     infospot.addHoverText(item.text);
+      //     infospot.toPanorama = panorama;
+      //     panorama.add( infospot );
 
-      function addSpotListInfo( data,panorama){
 
-        for (var i = 0; i < data.length; i++) {
-          var item = data[i];
+      //     if(item.link){
 
-          var url = "icon/new_spotd"+item.type+"_gif.png";
+      //       infospot.addEventListener( "click", function(){
 
-          var texture = PANOLENS.Utils.TextureLoader.load( url);
-          // PANOLENS.Utils.TextureLoader.load( url,function(texture){
 
-          addSpotList(item.list,texture,panorama);
 
-          // });
-        }
+      //           // panorama.link( panorama1, new THREE.Vector3( p[0],p[1],p[2] ) );
+      //           // panorama.link( panorama1, new THREE.Vector3( -3429.01, 1205.85, -3421.88 ) );
+      //           viewer.setPanorama( panorama1 );
+      //           // viewer.add( panorama1 );
+
+
+                
+      //       } );
+      //     }else{
+            
+      //       infospot.addEventListener( "click", function(){
+      //         this.focus();
+      //       } );
+
+
+      //     }
+
+      //   }
+
+      // }
+
+      // function addSpotListInfo( panorama,data){
+
+      //   for (var i = 0; i < data.length; i++) {
+      //     var item = data[i];
+
+      //     var url = "icon/new_spotd"+item.type+"_gif.png";
+
+      //     var texture = PANOLENS.Utils.TextureLoader.load( url);
+      //     // PANOLENS.Utils.TextureLoader.load( url,function(texture){
+
+      //     addSpotList(item.list,texture,panorama);
+
+      //     // });
+      //   }
    
-      }
+      // }
 
 
       var data = [
@@ -195,7 +206,8 @@
 
             {
               position:[-4425.16, -309.17, -2286.77],
-              text:"ccccccccccccc"
+              text:"ccccccccccccc",
+              link:1
             }
           ]
         },
@@ -214,21 +226,66 @@
 
       ];
 
-      var panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
-      viewer.add( panorama );
-      addSpotListInfo(data,panorama);
-      viewer.addUpdateCallback(function(){
 
-          var delta = viewer.clock.getDelta(); 
+      var data1 = [
 
-          var lists = panorama.children;
-          for (var i = 0; i < lists.length; i++) {
-            var spot = lists[i];
+        {
+          type:6,
+          list:[
+            {
+              position:[-4893.74, -511.32, -832.30],
+              text:"aaaaaaaaa"
+            }
+          
+          ]
+        },
 
-            spot.runAnimator.update(1000 * delta);
+        {
+          type:1,
+          list:[
 
-          }
-      });
+            {
+              position:[-4860.23, -354.92, 1099.61],
+              text:"ccccccccccccc",
+              link:0
+            }
+          ]
+        },
+
+      ];
+
+
+      var pano = new PANO();
+
+      pano.addPanorama('a.jpg',data);
+      pano.addPanorama('5.jpg',data1);
+
+
+
+
+      // var panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
+      // var panorama1 = new PANOLENS.ImagePanorama( '5.jpg' );
+      // viewer.add( panorama );
+      // viewer.add( panorama1 );
+
+      // addSpotListInfo(panorama,data);
+      // addSpotListInfo(panorama1,data1);
+
+
+
+
+      // viewer.addUpdateCallback(function(){
+
+      //     var delta = viewer.clock.getDelta(); 
+
+      //     var lists = panorama.children;
+      //     for (var i = 0; i < lists.length; i++) {
+      //       var spot = lists[i];
+
+      //       spot.runAnimator.update(1000 * delta);
+
+      //     }
+      // });
 
       
 
