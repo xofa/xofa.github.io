@@ -54,8 +54,9 @@
     <button id="rotate" onclick="autoRotate()">自动旋转</button> -->
    
     
-    <script src="js/three.min.js"></script>
-    <script src="js/panolens.min.js"></script>
+    <script src="js/three.js"></script>
+    <!-- <script src="../build/panolens-offline.min.js"></script> -->
+    <script src="../build/panolens-offline.js"></script>
 
     <script>
 
@@ -67,61 +68,171 @@
       // }
 
       var container = document.querySelector( '#container' );
-      var panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
 
       var viewer = new PANOLENS.Viewer( { 
 
         container: container,
         controlBar: true,
         controlButtons: [],
-        output: 'overlay'
+        autoHideInfospot: false,
+        output: 'console'
   
 
       } );
-
-      // console.log(viewer);
-      viewer.add( panorama );
-
-      function switchVR(){
-
-        viewer.toggleNextControl();
-      }
-
-      function autoRotate(){
-
-        if(viewer.getControlName() == "orbit"){
-
-          viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
-        }
-      }
+   
 
 
-      var switchVR = {
-        style: {
-          backgroundImage: 'url(icon/device.png)',
-          float: 'right'
-        },
-        
-        onTap: function(){
-          viewer.toggleNextControl();
-        }
-      };
-      viewer.appendControlItem(switchVR);
+      function addIconVR(){
 
-      var autoRotate = {
-        style: {
-          backgroundImage: 'url(icon/rotate.png)',
-          float: 'right'
-        },
-        
-        onTap: function(){
-          if(viewer.getControlName() == "orbit"){
-
-            viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
+        var switchVR = {
+          style: {
+            backgroundImage: 'url(icon/device.png)',
+            float: 'right'
+          },
+          
+          onTap: function(){
+            viewer.toggleNextControl();
           }
+        };
+        viewer.appendControlItem(switchVR);
+      }
+
+      addIconVR();
+      
+      function addIconRotate(){
+        var autoRotate = {
+          style: {
+            backgroundImage: 'url(icon/rotate.png)',
+            float: 'right'
+          },
+          
+          onTap: function(){
+            if(viewer.getControlName() == "orbit"){
+
+              viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
+            }
+          }
+        };
+        viewer.appendControlItem(autoRotate);
+      }
+      addIconRotate();
+
+
+
+
+
+
+      function addSpot(x,y,z,texture){
+
+
+        var infospot = new PANOLENS.Infospot( 350, texture,true);
+        infospot.position.set( x,y,z );
+
+        // infospot.show();
+        infospot.addEventListener( "click", function(){
+          this.focus();
+        } );
+
+        return infospot;
+
+      }
+
+      function addSpotList(items,texture,panorama){
+
+
+        for (var i = 0; i < items.length; i++) {
+
+          var item = items[i];
+
+          var p = item.position;
+          var infospot = addSpot(p[0],p[1],p[2],texture);
+          // infospot.addStaticText(item.text);
+          infospot.addHoverText(item.text);
+          infospot.runAnimator = new PANOLENS.TextureAnimator( texture, 1, 25, 25, 35 );
+          panorama.add( infospot );
         }
-      };
-      viewer.appendControlItem(autoRotate);
+
+      }
+
+      function addSpotListInfo( data,panorama){
+
+        for (var i = 0; i < data.length; i++) {
+          var item = data[i];
+
+          var url = "icon/new_spotd"+item.type+"_gif.png";
+
+          var texture = PANOLENS.Utils.TextureLoader.load( url);
+          // PANOLENS.Utils.TextureLoader.load( url,function(texture){
+
+          addSpotList(item.list,texture,panorama);
+
+          // });
+        }
+   
+      }
+
+
+      var data = [
+
+        {
+          type:6,
+          list:[
+            {
+              position:[0, -2000, -5000],
+              text:"aaaaaaaaa"
+            },
+            {
+              position:[-2956.65, -88.36, -4026.27],
+              text:"bbbbbbbbb"
+            }
+          
+          ]
+        },
+
+        {
+          type:1,
+          list:[
+
+            {
+              position:[-4425.16, -309.17, -2286.77],
+              text:"ccccccccccccc"
+            }
+          ]
+        },
+
+        {
+          type:3,
+          list:[
+
+            {
+              position:[-4864.16, -417.44, -1067.79],
+              text:"dddddd"
+            }
+          ]
+        },
+
+
+      ];
+
+      var panorama = new PANOLENS.ImagePanorama( 'a.jpg' );
+      viewer.add( panorama );
+      addSpotListInfo(data,panorama);
+      viewer.addUpdateCallback(function(){
+
+          var delta = viewer.clock.getDelta(); 
+
+          var lists = panorama.children;
+          for (var i = 0; i < lists.length; i++) {
+            var spot = lists[i];
+
+            spot.runAnimator.update(1000 * delta);
+
+          }
+      });
+
+      
+
+   
 
     </script>
 
