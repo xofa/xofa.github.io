@@ -4,6 +4,7 @@ var PANO = function(){
 	this.list = [];
 
 	var container = document.querySelector( '#container' );
+	this.progress = document.querySelector( '#progress' );
 
 	this.viewer = new PANOLENS.Viewer( { 
 
@@ -16,6 +17,12 @@ var PANO = function(){
 
 	} );
 
+	this.addIconVR();
+	this.addIconRotate();
+
+
+	return this;
+
 
 };
 
@@ -23,7 +30,6 @@ PANO.prototype = {
 
 
 	constructor: PANO,
-
 
 	addIconVR: function(){
 
@@ -70,9 +76,9 @@ PANO.prototype = {
 
           var p = item.position;
           var infospot = new PANOLENS.Infospot( 350, texture,true)
-          // infospot.addStaticText(item.text);
+          infospot.addStaticText(item.text);
+          // infospot.addHoverText(item.text);
           infospot.position.set( p[0],p[1],p[2] );
-          infospot.addHoverText(item.text);
           infospot.toPanorama = panorama;
           panorama.add( infospot );
 
@@ -88,6 +94,7 @@ PANO.prototype = {
             
             infospot.addEventListener( "click", function(){
               this.focus();
+              // this.element.style.display = 'block';
             } );
 
           }
@@ -114,12 +121,32 @@ PANO.prototype = {
    
     },
 
+    onProgress: function( event ) {
+
+        var ratio = parseInt(event.progress.loaded / event.progress.total * 100);
+
+        this.progress.innerHTML = "加载中..." +  ratio + '%';
+        if ( ratio === 100 ) {
+          this.progress.style.display = "none";
+        }
+
+    },
+
+    onEnter: function(event){
+
+    	this.progress.style.display = "block";
+    	this.progress.innerHTML = '';
+    },
+
 
 
     addPanorama: function(url,data){
 
 
     	var panorama = new PANOLENS.ImagePanorama( url );
+
+    	panorama.addEventListener( 'progress', this.onProgress.bind(this) );
+	    panorama.addEventListener( 'enter', this.onEnter.bind(this) );
 
     	this.addSpotListInfo(panorama,data);
     	this.viewer.add( panorama );

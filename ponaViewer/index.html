@@ -11,6 +11,8 @@
         height: 100%;
         overflow: hidden;
         background-color: #000;
+        color: #fff;
+        font-size: 20px;
       }
 
       #container {
@@ -33,29 +35,27 @@
         top:100px;
       }
 
-   /*   a:link, a:visited{
-        color: #bdc3c7;
-      }
 
-      .credit{
+      #progress{
+
         position: absolute;
-        text-align: center;
-        width: 100%;
-        padding: 20px 0;
-        color: #fff;
-      }*/
+        left: 40%;
+        top: 50%;
+
+      }
     </style>
   </head>
 
   <body>
     <div id="container"></div>
+    <div id="progress">加载中...</div>
 
-   <!--  <button id="vr" onclick="switchVR()">切换VR</button>
-    <button id="rotate" onclick="autoRotate()">自动旋转</button> -->
+   <button id="vr" onclick="switchVR()">切换VR</button>
+    <button id="rotate" onclick="autoRotate()">自动旋转</button>
    
     
-    <script src="js/three.js"></script>
-    <!-- <script src="../build/panolens-offline.min.js"></script> -->
+    <script src="js/three.min.js"></script>
+   
     <script src="js/panolens.min.js"></script>
     <script src="js/pano.js"></script>
 
@@ -68,197 +68,93 @@
       //   }, {passive: false})
       // }
 
-      // var container = document.querySelector( '#container' );
 
-      // var viewer = new PANOLENS.Viewer( { 
-
-      //   container: container,
-      //   controlBar: true,
-      //   controlButtons: [],
-      //   autoHideInfospot: false,
-      //   output: 'console'
-  
-
-      // } );
-   
-
-
-      // function addIconVR(){
-
-      //   var switchVR = {
-      //     style: {
-      //       backgroundImage: 'url(icon/device.png)',
-      //       float: 'right'
-      //     },
-          
-      //     onTap: function(){
-      //       viewer.toggleNextControl();
-      //     }
-      //   };
-      //   viewer.appendControlItem(switchVR);
-      // }
-
-      // addIconVR();
-      
-      // function addIconRotate(){
-      //   var autoRotate = {
-      //     style: {
-      //       backgroundImage: 'url(icon/rotate.png)',
-      //       float: 'right'
-      //     },
-          
-      //     onTap: function(){
-      //       if(viewer.getControlName() == "orbit"){
-
-      //         viewer.OrbitControls.autoRotate = !viewer.OrbitControls.autoRotate;
-      //       }
-      //     }
-      //   };
-      //   viewer.appendControlItem(autoRotate);
-      // }
-      // addIconRotate();
-
-
-
-      // function addSpotList(items,texture,panorama){
-
-
-      //   for (var i = 0; i < items.length; i++) {
-
-      //     var item = items[i];
-
-      //     var p = item.position;
-      //     // var infospot = addSpot(p[0],p[1],p[2],texture);
-
-      //     var infospot = new PANOLENS.Infospot( 350, texture,true)
-      //     // infospot.addStaticText(item.text);
-      //     infospot.position.set( p[0],p[1],p[2] );
-      //     infospot.addHoverText(item.text);
-      //     infospot.toPanorama = panorama;
-      //     panorama.add( infospot );
-
-
-      //     if(item.link){
-
-      //       infospot.addEventListener( "click", function(){
-
-
-
-      //           // panorama.link( panorama1, new THREE.Vector3( p[0],p[1],p[2] ) );
-      //           // panorama.link( panorama1, new THREE.Vector3( -3429.01, 1205.85, -3421.88 ) );
-      //           viewer.setPanorama( panorama1 );
-      //           // viewer.add( panorama1 );
-
-
-                
-      //       } );
-      //     }else{
-            
-      //       infospot.addEventListener( "click", function(){
-      //         this.focus();
-      //       } );
-
-
-      //     }
-
-      //   }
-
-      // }
-
-      // function addSpotListInfo( panorama,data){
-
-      //   for (var i = 0; i < data.length; i++) {
-      //     var item = data[i];
-
-      //     var url = "icon/new_spotd"+item.type+"_gif.png";
-
-      //     var texture = PANOLENS.Utils.TextureLoader.load( url);
-      //     // PANOLENS.Utils.TextureLoader.load( url,function(texture){
-
-      //     addSpotList(item.list,texture,panorama);
-
-      //     // });
-      //   }
-   
-      // }
-
-
-      var data = [
-
+      var files = [
         {
-          type:6,
-          list:[
+          name:"客厅",
+          url:"a.jpg",
+          data: [
+
             {
-              position:[0, -2000, -5000],
-              text:"aaaaaaaaa"
+              type:6,
+              list:[
+                {
+                  position:[0, -2000, -5000],
+                  text:"aaaaaaaaa"
+                },
+                {
+                  position:[-2956.65, -88.36, -4026.27],
+                  text:"bbbbbbbbb"
+                }
+              
+              ]
             },
+
             {
-              position:[-2956.65, -88.36, -4026.27],
-              text:"bbbbbbbbb"
-            }
-          
+              type:1,
+              list:[
+
+                {
+                  position:[-4425.16, -309.17, -2286.77],
+                  text:"ccccccccccccc",
+                  link:1
+                }
+              ]
+            },
+
+            {
+              type:3,
+              list:[
+
+                {
+                  position:[-4864.16, -417.44, -1067.79],
+                  text:"dddddd"
+                }
+              ]
+            },
+
+
           ]
         },
-
         {
-          type:1,
-          list:[
+          name:"其他",
+          url:"5.jpg",
+          data: [
+            {
+              type:6,
+              list:[
+                {
+                  position:[-4893.74, -511.32, -832.30],
+                  text:"aaaaaaaaa"
+                }
+              
+              ]
+            },
 
             {
-              position:[-4425.16, -309.17, -2286.77],
-              text:"ccccccccccccc",
-              link:1
-            }
+              type:1,
+              list:[
+
+                {
+                  position:[-4860.23, -354.92, 1099.61],
+                  text:"ccccccccccccc",
+                  link:0
+                }
+              ]
+            },
+
           ]
-        },
-
-        {
-          type:3,
-          list:[
-
-            {
-              position:[-4864.16, -417.44, -1067.79],
-              text:"dddddd"
-            }
-          ]
-        },
-
-
-      ];
-
-
-      var data1 = [
-
-        {
-          type:6,
-          list:[
-            {
-              position:[-4893.74, -511.32, -832.30],
-              text:"aaaaaaaaa"
-            }
-          
-          ]
-        },
-
-        {
-          type:1,
-          list:[
-
-            {
-              position:[-4860.23, -354.92, 1099.61],
-              text:"ccccccccccccc",
-              link:0
-            }
-          ]
-        },
-
+        }
       ];
 
 
       var pano = new PANO();
 
-      pano.addPanorama('a.jpg',data);
-      pano.addPanorama('5.jpg',data1);
+      for (var i = 0; i < files.length; i++) {
+        var item = files[i];
+        pano.addPanorama(item.url,item.data);
+      }
+
 
 
 
