@@ -311,7 +311,7 @@ function init3d(){
   e3d.toggle.isPC = true;
   e3d.init();
 
-  modelLoader = new IMAPIC3D.IP3DLoader(e3d,'http://box.imapic.cn');
+  modelLoader = new IMAPIC3D.IP3DLoader(e3d,'https://box.imapic.cn');
 
   // var caseid = GetQueryString('id');
   // modelLoader.loadCaseAndUpdateWallPaper(caseid);
@@ -474,7 +474,7 @@ function loadHouseByID(engine){
 
   var id = GetQueryString('shapeId');
 
-  var url = "http://box.imapic.cn"
+  var url = "https://box.imapic.cn"
   // var url = "http://47.100.46.19"
 
   $.get(url + "/miniapp/api/housetype/select?id="+id, function(data){
