@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ImaPic 2D </title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/example.css" rel="stylesheet">
+
+
+
+    <style type="text/css">
+    
+      a,a:hover,a:focus{
+        text-decoration: none;
+      }
+      .roomButton{
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+        display: inline-block;
+        padding: 6px 12px;
+        margin-bottom: 5px;
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 1.42857143;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        text-decoration: none;
+      }
+
+      .pan{
+        position: absolute;
+        width: 128px;
+        right: 10px;
+        bottom: 10px;
+      }
+
+      .zin{
+
+        z-index: 9999;
+      }
+
+ 
+    </style>
+
+  </head>
+
+  <body >
+
+    <div class="container-fluid">
+      <div class="row main-row">
+        <div class="col-xs-12 main">
+        <!-- 3D Viewer -->
+        <div id="viewer">
+          <div id="container"></div>
+          <!-- <button id="startBox" style="position: absolute;right:20px;top:20px;">进入box编辑</button>
+          <button id="exitBox" style="position: absolute;right:100px;top:20px;">退出box</button> -->
+
+          <div  style="position: absolute;left:250px;top:50px;color:white">(键盘按键)：视角切换顶视图：t,  底视图：b,   左视图：l,    前视图：f <br/>鼠标箭头移动时，按住ctrl键，进行网格吸附移动</div>
+
+          <button id="back2d" style="position: absolute;right:200px;top:20px;">返回到2D</button>
+          <button id="changeFloor" style="position: absolute;right:300px;top:20px;">网格显示</button>
+
+          <button id="itemFloor" style="position: absolute;right:50px;top:50px;">沙发</button>
+          <button id="itemFloor1" style="position: absolute;right:50px;top:100px;">茶几</button>
+          <button id="itemWall" style="position: absolute;right:50px;top:150px;">画1</button>
+          <button id="itemWall1" style="position: absolute;right:50px;top:200px;">画2</button>
+          <button id="itemRoof" style="position: absolute;right:50px;top:250px;">吊灯</button>
+       
+
+          <img class='pan' src='../static/images/1.png' />
+          <img class='pan zin' src='../static/images/2.png' />
+          <!-- <button id="switchTransparent" style="position: absolute;right:60px;top:20px;">截图</button> -->
+
+          <!-- <div style="position: absolute;top:0px;left: 0px">
+            <button>查看</button>
+          </div> -->
+        </div>  
+        <!-- 2D Floorplanner -->
+        <div id="floorplanner">
+
+            <canvas id="canvas2d"></canvas>
+
+          <!-- <div id = "inputMenu">
+            <div id = "wallSetting" style="width: 200px;height: 100px;background-color: white;position: absolute;margin:20px"> -->
+              <input id ='wallLengthSetting' type="text" value="2222"  style="display:none;position: absolute;width: 38px;height: 20px;font-size: 10px;font-family:Arial, Helvetica, sans-serif";>
+              <input id ='wallLengthSetting2' type="text" value="2222"  style="display:none;position: absolute;width: 38px;height: 20px;font-size: 10px;font-family:Arial, Helvetica, sans-serif";>
+            <!-- </div>
+          </div> -->
+          <div id="roomSetting"  style="width:300px;position:absolute;display: none;border: 1px solid #ccc;background: #fff" >
+          
+            <div style="min-height: 16.42857143px; padding: 10px; border-bottom: 1px solid #e5e5e5;">
+              <button id='roomSettingClose' style="float: right;background: transparent;border: 0;font-size: 21px;"><span>&times;</span></button>
+              <h4  >房间设置</h4>
+            </div>
+            <div style="position: relative;padding: 15px;">              
+              <a href="#" class="roomButton">主卧</a>
+              <a href="#" class="roomButton" >次卧</a>
+              <a href="#" class="roomButton">儿童房</a>
+              <a href="#" class="roomButton">书房</a></br>             
+              <a href="#" class="roomButton">客厅</a>
+              <a href="#" class="roomButton">餐厅</a>
+              <a href="#" class="roomButton">卫生间</a>
+              <a href="#" class="roomButton">厨房</a></br>             
+              <a href="#" class="roomButton">阳台</a>
+              <a href="#" class="roomButton">门厅</a>         
+            </div>
+          
+          </div>
+
+          <div id='wallSelectedSetting'  style="width:300px;position:absolute;display: none;">
+            <a id='splice_wall' href="#" class="roomButton">拆分</a>
+            <a id='delete_wall' href="#" class="roomButton">删除</a> 
+          </div>
+
+          <div id="camera-controls">
+            <a href="#" class="btn btn-default btn-sm" id="exportJSON">
+              导出JSON
+            </a>
+            <a href="#" class="btn btn-default btn-sm" id="exportOBJ">
+              导出模型
+            </a>
+            <a href="#" class="btn btn-default btn-sm" id="newFile">
+              新建户型
+            </a>
+            <a href="#" class="btn btn-default btn-sm" id="saveFile">
+              保存户型
+            </a>
+            <a class="btn btn-sm btn-default btn-file">
+             <input type="file" class="hidden-input" id="loadFile">
+              读取户型
+            </a>
+
+            <a href="#" class="btn btn-default btn-sm" id="undo">
+              UNDO
+            </a>
+            <a href="#" class="btn btn-default btn-sm" id="redo">
+              REDO
+            </a>
+
+         
+          </div>
+
+          <div id="floorplanner-controls">
+
+            <!-- <button id="move" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-move"></span>
+              平移
+            </button>
+            <button id="draw" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              绘制墙体
+            </button>
+
+            <button id="rect_struct" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              梁柱
+            </button>
+
+             <button id="door_dan" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              单开门
+            </button>
+            <button id="door_shuang" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              双开门
+            </button>
+            <button id="door_tuiyi" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              推移门
+            </button>
+            <button id="door_yushi" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              浴室门
+            </button>
+            <button id="door_chufang" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              厨房门
+            </button>
+            <button id="door_ruhu" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              入户门
+            </button>
+
+            <button id="window_putong" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              普通窗
+            </button>
+            <button id="window_luodi" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              落地窗
+            </button>
+            <button id="window_piao" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              飘窗
+            </button>
+
+            <button id="door_dong" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-pencil"></span>
+              门洞
+            </button>
+
+            <button id="delete" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-remove"></span>
+              删除选中
+            </button>
+
+             <button id="deleteAll" class="btn btn-sm btn-default">
+              <span class="glyphicon glyphicon-trash"></span>
+              清空画布
+            </button> -->
+
+            <button id="toggle-snap" class="btn btn-sm btn-default">
+              关闭吸附
+            </button>
+
+            <button id="toggle-ortho" class="btn btn-sm btn-default">
+              开启正交绘制
+            </button>
+
+            <button id="toggle-InnerLine" class="btn btn-sm btn-default">
+              墙内线绘制
+            </button>
+
+
+            <span class="pull-right">
+              <button class="btn btn-primary btn-sm" id="into3d">切换到三维浏览</button>
+            </span>
+
+
+          
+
+      
+          </div>
+
+          <div id="draw-walls-hint">
+             按 ESC 退出墙体绘制模式
+          </div>
+          <!-- <img src="texture/wood1.jpg" id="roomBkg" style="visibility: hidden;" /> -->
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/bootstrap.js"></script>
+    
+    <script src="../build/three.js"></script> 
+    <!-- <script src="js/lib/TransformControls.js"></script>  -->
+    <script src="js/lib/OBJExporter.js"></script> 
+    <script src="js/lib/FileJSONExporter.js"></script> 
+
+    <!-- <script src="../build/post/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="../build/post/EffectComposer.js"></script>
+		<script src="../build/post/RenderPass.js"></script>
+		<script src="../build/post/ShaderPass.js"></script>
+		<script src="../build/post/OutlinePass.js"></script> -->
+
+
+    <script src="js/lib/OrbitControls.js"></script> 
+    <script src="../build/TransformControls.js"></script>
+    <script src="../build/imapic2d.js"></script>
+    <!-- <script src="js/lib/OBJLoader3.js"></script>  -->
+    <!-- <script src="../build/0727house3d.js"></script> -->
+    <script src="../build/IP3DLoader.js"></script>
+    <!-- <script src="js/SVGLoader.js"></script>
+    <script src="js/tmp3d/ObjectParse.js"></script>
+    <script src="js/tmp3d/SceneLoader.js"></script> -->
+    <script src="js/example.js"></script>
+  </body>
+</html>
