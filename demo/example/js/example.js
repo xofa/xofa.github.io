@@ -145,7 +145,7 @@ $(document).ready(function() {
           console.log(event);
       } );
       
-      modelLoader = new IMAPIC3D.IP3DLoader(imapic3d,'http://box.imapic.cn');
+      modelLoader = new IMAPIC3D.IP3DLoader(imapic3d,'https://box.imapic.cn');
 
       var caseid = GetQueryString('id');
       modelLoader.loadCaseAndUpdateWallPaper(caseid);
