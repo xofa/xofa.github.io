@@ -16,7 +16,7 @@ $(document).ready(function() {
   
   engine = init2d();
 
-  
+  // goto3d();
 
   $('#canvas2d').bind("mouseup", (event) => { 
 
@@ -125,8 +125,20 @@ $(document).ready(function() {
 
   });
 
-  $('#into3d').click(function(){
+  var selectTDQ = null;
+  $('#viewOrth').click(function(){
 
+    if(selectTDQ == null) return;
+
+    console.log(selectTDQ);
+
+    var intersect = selectTDQ.intersect;
+    imapic3d.handleEvent.setViewByWallNormal(intersect.face.normal,intersect.point);
+
+  });  
+
+
+  function goto3d(){
     $('#floorplanner').hide();
     $('#viewer').show();
 
@@ -140,10 +152,21 @@ $(document).ready(function() {
       imapic3d.init();
 
       var handleEvent = imapic3d.Get_handle();
+      $(".menu").hide();
       handleEvent.addEventListener( 'PlaceClick', function ( event ) {
 
-          console.log(event);
+          $(".menu").show();
+          $(".menu").css("left",event.mouse.x);
+          $(".menu").css("top",event.mouse.y);
+
+          selectTDQ = event;
       } );
+
+      // var control = imapic3d.Get_OrbitControl();
+      handleEvent.addEventListener('mousedown', function(){
+          $(".menu").hide();
+    
+      });
       
       modelLoader = new IMAPIC3D.IP3DLoader(imapic3d,'https://box.imapic.cn');
 
@@ -170,11 +193,16 @@ $(document).ready(function() {
     modelLoader.loadInWall(json['inWalls']);
 
     modelLoader.loadDroppedCeiling(json['rectStructs']);
+  }
+
+  $('#into3d').click(function(){
+
+    goto3d();
   
 
   });
 
-  //http://box.imapic.cn/box/api/item/ListV2?PageIndex=1&PageSize=20&TypeId=481&menuid=1
+  //https://box.imapic.cn/box/api/item/ListV2?PageIndex=1&PageSize=20&TypeId=481&menuid=1
 
   var matrix = new THREE.Matrix4().makeScale(0.1,0.1,0.1);
   var matrixR = new THREE.Matrix4().makeRotationX(Math.PI/2);
@@ -184,15 +212,38 @@ $(document).ready(function() {
 	// });
 
   var items = [
-    "35151573-BCF7-4BE0-900F-A300E2E7BBAB",
+    "35151573-BCF7-4BE0-900F-A300E2E7BBAB", 
     "964B35E4-C85F-46C6-BB0F-69DEFDDC5534",
     "7821D402-76E1-4479-8A08-5FAAECBB468F",
     "AC12FC6F-A8EA-486D-B1D6-2B7DCCD469FC",
     "1B4E5D23-52A7-4FBC-9FEF-2C1EE2219A83"
   ];
 
+  var size = [
+    {x:149.7,z:91.7},
+    {x:59.7,z:30.4},
+    {x:45.5,z:64.3},
+    {x:128.0,z:58.0},
+    {x:50.5,z:50.5}
+  ];
+
+
+  function getWallCenter(){
+
+    var walls = imapic3d.Get_Walls();
+    var wall = walls[0];
+    var box = new THREE.Box3().setFromObject(wall);
+    return box.min.clone().add(box.max).multiplyScalar(0.5);
+  }
+ 
   $('#itemFloor').click(function(){
-    var mat = new THREE.Matrix4().makeTranslation(0,0,0);
+
+   
+    
+    var center = getWallCenter();
+
+
+    var mat = new THREE.Matrix4().makeTranslation(0,0,center.z+size[0].z);
     mat.multiply(matrix);
     modelLoader.requestItem(items[0],{
         matrix:mat,
@@ -200,8 +251,36 @@ $(document).ready(function() {
     });
     
   });
+
+  function findTypePosition(ipic3d,name){
+
+    var gp = ipic3d.Get_SelectableGroup().children;
+    var sofa = undefined;
+    for (let i = 0; i < gp.length; i++) {
+      const element = gp[i];
+      if(element.name&&element.name.indexOf(name)> -1){
+        sofa = element; 
+      }
+    }
+
+    if(sofa == undefined){
+      return false;
+    }else{
+      return sofa.position;
+    }
+
+
+  }
   $('#itemFloor1').click(function(){
-    var mat = new THREE.Matrix4().makeTranslation(-20,0,70);
+
+    var center = getWallCenter();
+
+    var pos = {
+      x: center.x,
+      z : center.z + size[0].z
+    };
+
+    var mat = new THREE.Matrix4().makeTranslation(pos.x,0,pos.z+size[1].z + 20);
     mat.multiply(matrix);
     modelLoader.requestItem(items[1],{
         matrix:mat,
@@ -210,7 +289,9 @@ $(document).ready(function() {
     
   });
   $('#itemWall').click(function(){
-    var mat = new THREE.Matrix4().makeTranslation(-193.77633399303852 ,141.75964089708236, -198.79046630859372);
+
+    var center = getWallCenter();
+    var mat = new THREE.Matrix4().makeTranslation(-100 ,152, center.z);
     mat.multiply(matrix);
     mat.multiply(matrixR);
     modelLoader.requestItem(items[2],{
@@ -219,8 +300,12 @@ $(document).ready(function() {
     });
     
   });
+  
   $('#itemWall1').click(function(){
-    var mat = new THREE.Matrix4().makeTranslation(238.8404473970879 ,130.03868406527874 ,-198.7904663085938);
+
+    var center = getWallCenter();
+
+    var mat = new THREE.Matrix4().makeTranslation(100 ,152, center.z);
     mat.multiply(matrix);
     mat.multiply(matrixR);
     modelLoader.requestItem(items[3],{
@@ -231,7 +316,11 @@ $(document).ready(function() {
   });
   $('#itemRoof').click(function(){
 
-    var mat = new THREE.Matrix4().makeTranslation(0,280,0);
+    var pos = findTypePosition(imapic3d,"茶几");
+    if(!pos){
+      pos = { x:0,z:0 };
+    }
+    var mat = new THREE.Matrix4().makeTranslation(pos.x,280,pos.z);
     mat.multiply(matrix);
     modelLoader.requestItem(items[4],{
         matrix:mat,
@@ -305,8 +394,6 @@ function init2d(){
 
 function init3d(){
 
-
-
   var e3d = new IMAPIC3D.Engine($('#viewer')[0],window.innerWidth,window.innerHeight,window.devicePixelRatio);
   e3d.toggle.isPC = true;
   e3d.init();
@@ -315,7 +402,6 @@ function init3d(){
 
   // var caseid = GetQueryString('id');
   // modelLoader.loadCaseAndUpdateWallPaper(caseid);
-
 
   return e3d;
 }
@@ -389,7 +475,7 @@ function showSeletedMenu(divName,selectedItem,event){
 function saveFile(type,engine){
 
 
-  var link = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
+  var link = document.createElementNS("https://www.w3.org/1999/xhtml", "a");
   link.style.display = 'none';
   document.body.appendChild( link ); // Firefox workaround, see #6594
 
@@ -474,8 +560,16 @@ function loadHouseByID(engine){
 
   var id = GetQueryString('shapeId');
 
+<<<<<<< .mine
+  var url = "https://box.imapic.cn"
+  // var url = "https://47.100.46.19"
+||||||| .r121
+  var url = "http://box.imapic.cn"
+  // var url = "http://47.100.46.19"
+=======
   var url = "https://box.imapic.cn"
   // var url = "http://47.100.46.19"
+>>>>>>> .r123
 
   $.get(url + "/miniapp/api/housetype/select?id="+id, function(data){
 
