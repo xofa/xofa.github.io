@@ -379,6 +379,9 @@ IMAPIC3D.IP3DLoader.prototype = {
 			object.uuid = parameter.uuid;
 			object.name = parameter.name;
 
+			var box = new THREE.Box3().setFromObject(object);
+			console.log(box);
+
 			// console.log(object.name);
 
 			if(parameter.matrix == undefined){
@@ -391,6 +394,7 @@ IMAPIC3D.IP3DLoader.prototype = {
 			// }else{
 			// 	self.imapic3d.addItem(object);
 			// }
+
 
 			self.setLoadItemFinishCallback(object, parent);
 

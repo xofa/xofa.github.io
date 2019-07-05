@@ -5788,6 +5788,7 @@ var IMAPIC3D;
         function HandleEvent(engine) {
             var _this = _super.call(this) || this;
             _this.engine = engine;
+            _this.selected = undefined;
             _this.placeList = [];
             _this.mouseDowned = false;
             _this.enabled = true;
@@ -5820,6 +5821,19 @@ var IMAPIC3D;
             this.renderer.domElement.addEventListener("touchcancel", this.handelMouseUp.bind(this), false);
             this.renderer.domElement.addEventListener("touchleave", this.handelMouseUp.bind(this), false);
             this.resize();
+        };
+        HandleEvent.prototype.setViewByWallNormal = function (vec, p) {
+            var control = this.engine.Get_OrbitControl();
+            var camera = this.engine.Get_Camera();
+            var pos = vec.clone().multiplyScalar(500);
+            camera.position.copy(pos);
+            camera.up.set(0, 1, 0);
+            control.target.set(0, -100, 0);
+            control.update();
+            var offset = camera.position.sub(control.target);
+            var axis = vec.clone().cross(new THREE.Vector3(0, 1, 0));
+            var point = p.clone().add(vec.multiplyScalar(2.0));
+            this.dispatchEvent({ type: 'changeGrid', offset: offset.length(), dir: axis, point: point });
         };
         HandleEvent.prototype.handleKeyDown = function (event) {
             var transTontrol = this.engine.Get_TransControl();
@@ -5892,7 +5906,20 @@ var IMAPIC3D;
             this.renderer.setSize(this.size.x, this.size.y);
         };
         HandleEvent.prototype.updateSelected = function (event) {
-            var selected = this.itemSelect.GetSelected(event);
+            var intersect = this.itemSelect.getIntersect(event, this.engine.Get_SelectableGroup().children);
+            var selected = !intersect ? undefined : this.itemSelect.findSelectedEntity(intersect.object);
+            var type = IMAPIC3D.Item.GetType(selected);
+            if (type && IMAPIC3D.Item.isTypeInList(selected, ["Wall", "Roof", "Floor"])) {
+                this.dispatchEvent({
+                    type: "PlaceClick",
+                    itemType: type,
+                    object: selected,
+                    mouse: {
+                        x: event.clientX, y: event.clientY
+                    },
+                    intersect: intersect
+                });
+            }
             if (this.selected != selected) {
                 var transControl = this.engine.Get_TransControl();
                 this.placeList = this.engine.Get_Placable(selected);
@@ -5906,14 +5933,13 @@ var IMAPIC3D;
                 }
                 this.selectedHelper.setFromObject(selected);
                 this.selected = selected;
-                var type = IMAPIC3D.Item.GetType(selected);
-                type && IMAPIC3D.Item.isTypeInList(selected, ["Wall", "Roof", "Floor"]) && this.dispatchEvent({ type: "PlaceClick", itemType: type, object: selected });
             }
         };
         HandleEvent.prototype.getPointer = function (event) {
             return event.changedTouches ? event.changedTouches[0] : event;
         };
         HandleEvent.prototype.handleMouseDown = function (event) {
+            this.dispatchEvent({ type: "mousedown" });
             if (this.enabled === false)
                 return;
             var target = event.target;
@@ -6047,32 +6073,22 @@ var IMAPIC3D;
         Engine.prototype.Get_handle = function () {
             return this.handleEvent;
         };
+        Engine.prototype.Get_Walls = function () {
+            var walls = [];
+            this._selectableGroup.children.forEach(function (child) {
+                (IMAPIC3D.Item.GetType(child) == "Wall") && walls.push(child);
+                console.log(IMAPIC3D.Item.GetType(child));
+            });
+            return walls;
+        };
         Engine.prototype.initControls = function (camera, domElement, scene) {
             this.handleEvent = new IMAPIC3D.HandleEvent(this);
+            this.handleEvent.addEventListener('changeGrid', this.updateGrid.bind(this));
             this._orbControls = new THREE.OrbitControls(camera, domElement);
             this._orbControls.target.copy(this._sceneCenter);
             var scope = this;
             this._orbControls.update();
-            this._orbControls.addEventListener('changeGrid', function (event) {
-                var camera = scope.Get_Camera();
-                scope.grid.geometry.dispose();
-                var scale = event.offset;
-                if (camera instanceof THREE.PerspectiveCamera) {
-                    scale = Math.round(scale / 300);
-                    scale = Math.max(1, scale);
-                    scale = Math.min(4, scale);
-                    scale = 40 / scale;
-                }
-                else if (camera instanceof THREE.OrthographicCamera) {
-                    scale = camera.zoom;
-                    scale = Math.round(scale * 10);
-                    scale = Math.max(4, scale);
-                    scale = Math.min(40, scale);
-                }
-                var grid = new THREE.GridHelper(1000, scale);
-                scope.grid.geometry = grid.geometry;
-                scope.handleEvent.translationSnapStep = 1000 / scale;
-            });
+            this._orbControls.addEventListener('changeGrid', this.updateGrid.bind(this));
             var screenRatio = this.toggle.isPC ? 0.7 : 1.5;
             this._tranControls = new TransformControls(camera, domElement);
             this._tranControls.setRotationSnap(Math.PI / 4);
@@ -6086,6 +6102,33 @@ var IMAPIC3D;
             this._tranControls.addEventListener('objectChange', function (event) {
                 scope.handleEvent.selectedHelper.update();
             });
+        };
+        Engine.prototype.updateGrid = function (event) {
+            var scope = this;
+            var camera = scope.Get_Camera();
+            scope.grid.geometry.dispose();
+            var scale = event.offset;
+            if (camera instanceof THREE.PerspectiveCamera) {
+                scale = Math.round(scale / 300);
+                scale = Math.max(1, scale);
+                scale = Math.min(4, scale);
+                scale = 40 / scale;
+            }
+            else if (camera instanceof THREE.OrthographicCamera) {
+                scale = camera.zoom;
+                scale = Math.round(scale * 10);
+                scale = Math.max(4, scale);
+                scale = Math.min(40, scale);
+            }
+            var grid = new THREE.GridHelper(1000, scale);
+            scope.grid.geometry = grid.geometry;
+            if (event.dir) {
+                scope.grid.setRotationFromAxisAngle(event.dir, Math.PI / 2);
+            }
+            if (event.point) {
+                scope.grid.position.copy(event.point);
+            }
+            scope.handleEvent.translationSnapStep = 1000 / scale;
         };
         Engine.prototype.initScene = function () {
             this._cameraPer = new THREE.PerspectiveCamera(60, this._canvasSize.x / this._canvasSize.y, 1, 100000);

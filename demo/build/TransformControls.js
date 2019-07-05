@@ -432,6 +432,9 @@ TransformControls = function ( camera, domElement ) {
 		return ray.intersectObjects( list, true )[ 0 ] || false;
 	}
 
+
+	// this.lastTime = Date.now();
+
 	this.pointerDown = function( pointer ) {
 
 		if ( this.object === undefined || this.axis === null || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 )  ) return;
@@ -512,7 +515,25 @@ TransformControls = function ( camera, domElement ) {
 
 			var moveLine = new IMAPIC2D.Line().fromNumber(pointStart.x,pointStart.z,pointEnd.x,pointEnd.z);
 
-			var pos = pointEnd.clone().sub( pointStart ).add( _positionStart );
+			var p0 = pointEnd.clone().sub( pointStart );
+
+			p0.x *= 0.9;
+			p0.z *= 0.9;
+
+			// console.log(p);
+
+			var pos = p0.clone().add( _positionStart );
+
+			var p = pos.clone().sub(object.position);
+			// console.log(p);
+
+			var px = Math.abs(p.x);
+			var pz = Math.abs(p.z);
+			if(px < 0.5 && !px&&pz/px > 6){
+				pos.x = object.position.x;
+			}else if(pz < 0.5 && !pz&&px/pz > 6){
+				pos.z = object.position.z;
+			}
 
 			// var p = this.isCollisionWithWall(moveLine);
 			// if(p){
@@ -855,7 +876,7 @@ TransformControlsGizmo = function () {
 	var defaultMat = gizmoMaterial.clone();
 	defaultMat.color.set( 0x479FFF );
 	// var arrowGeometry = new THREE.CylinderBufferGeometry( 0, 0.05, 0.2, 12, 1, false);
-	var arrowGeometry = new ArrowGeometry( 0.8,0.05);
+	var arrowGeometry = new ArrowGeometry( 0.8,0.08);
 	// var arrowMesh = new THREE.Mesh( arrowGeometry, defaultMat );
 
 	var arrowMesh = new THREE.Mesh( arrowGeometry, defaultMat );
@@ -1190,24 +1211,30 @@ TransformControlsGizmo = function () {
 
 		var quaternion = space === "local" ? this.worldQuaternion : identityQuaternion;
 
-		var eyeDistance = this.worldPosition.distanceTo( this.cameraPosition);
+		var eyeDistance = 600;
 
+		if(this.camera instanceof THREE.PerspectiveCamera){
+
+			eyeDistance = this.worldPosition.distanceTo( this.cameraPosition);
+
+		}else{
+			eyeDistance =   1000 / this.camera.zoom;
+			
+			// console.log(this.camera.zoom);
+		}
 		eyeDistance = Math.min(1200,eyeDistance);
 		eyeDistance = Math.max(500,eyeDistance);
-
 		for ( var i = 0; i < handles.length; i++ ) {
 
 			var handle = handles[i];
 
 			// hide aligned to camera
-
 			handle.visible = true;
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 4 ); //4 or 7
+			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 ); //4 or 7
 
-			
 
 			// }else{
 				// Align handles to current local or world rotation

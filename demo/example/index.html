@@ -47,6 +47,18 @@
         z-index: 9999;
       }
 
+      .menu{
+        font:15px verdana, arial, sans-serif; /* 设置文字大小和字体样式 */
+        position: absolute;
+      }
+      .menu, 
+      .menu li {
+        list-style:none; /* 将默认的列表符号去掉 */
+        padding:2px; /* 将默认的内边距去掉 */
+        margin:0; /* 将默认的外边距去掉 */
+        float:left;
+      }
+
  
     </style>
 
@@ -62,9 +74,6 @@
           <div id="container"></div>
           <!-- <button id="startBox" style="position: absolute;right:20px;top:20px;">进入box编辑</button>
           <button id="exitBox" style="position: absolute;right:100px;top:20px;">退出box</button> -->
-
-          <div  style="position: absolute;left:250px;top:50px;color:white">(键盘按键)：视角切换顶视图：t,  底视图：b,   左视图：l,    前视图：f <br/>鼠标箭头移动时，按住ctrl键，进行网格吸附移动</div>
-
           <button id="back2d" style="position: absolute;right:200px;top:20px;">返回到2D</button>
           <button id="changeFloor" style="position: absolute;right:300px;top:20px;">网格显示</button>
 
@@ -73,6 +82,13 @@
           <button id="itemWall" style="position: absolute;right:50px;top:150px;">画1</button>
           <button id="itemWall1" style="position: absolute;right:50px;top:200px;">画2</button>
           <button id="itemRoof" style="position: absolute;right:50px;top:250px;">吊灯</button>
+
+
+          <ul class="menu">
+
+            <li><button id="viewOrth">编辑</button></li>
+            <!-- <li><button>其他功能</button></li> -->
+          </ul>
        
 
           <img class='pan' src='../static/images/1.png' />
