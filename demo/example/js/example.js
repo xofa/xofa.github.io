@@ -560,16 +560,8 @@ function loadHouseByID(engine){
 
   var id = GetQueryString('shapeId');
 
-<<<<<<< .mine
   var url = "https://box.imapic.cn"
   // var url = "https://47.100.46.19"
-||||||| .r121
-  var url = "http://box.imapic.cn"
-  // var url = "http://47.100.46.19"
-=======
-  var url = "https://box.imapic.cn"
-  // var url = "http://47.100.46.19"
->>>>>>> .r123
 
   $.get(url + "/miniapp/api/housetype/select?id="+id, function(data){
 
